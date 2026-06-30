@@ -1,0 +1,72 @@
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import { Suspense } from "react";
+import "./globals.css";
+import { Toaster } from "sonner";
+import { CookieConsent } from "@/components/cookie-consent";
+import { NavigationProgress } from "@/components/navigation-progress";
+import { siteConfig } from "@/lib/site";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
+  title: {
+    default: `${siteConfig.name}: ${siteConfig.tagline}`,
+    template: `%s | ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
+  keywords: [
+    "research assistance",
+    "technical assistance",
+    "academic help",
+    "data analysis",
+    "homework help",
+    "thesis help",
+    "coding help",
+    "engineering help",
+    "writing assistance",
+    "editing proofreading",
+    "online tutoring",
+    "consulting",
+  ],
+  authors: [{ name: siteConfig.legalName }],
+  creator: siteConfig.legalName,
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteConfig.url,
+    title: `${siteConfig.name}: ${siteConfig.tagline}`,
+    description: siteConfig.description,
+    siteName: siteConfig.name,
+    images: [{ url: siteConfig.ogImage, width: 1200, height: 630, alt: siteConfig.name }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${siteConfig.name}: ${siteConfig.tagline}`,
+    description: siteConfig.description,
+    images: [siteConfig.ogImage],
+  },
+  robots: { index: true, follow: true },
+  icons: {
+    icon: "/assistbridge-logo.png",
+    apple: "/assistbridge-logo.png",
+  },
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" className={inter.variable} data-scroll-behavior="smooth">
+      <body className="min-h-screen flex flex-col bg-white text-slate-900 antialiased">
+        <Suspense fallback={null}><NavigationProgress /></Suspense>
+        {children}
+        <Toaster position="top-right" richColors closeButton />
+        <CookieConsent />
+      </body>
+    </html>
+  );
+}

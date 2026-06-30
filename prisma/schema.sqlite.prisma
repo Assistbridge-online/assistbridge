@@ -1,0 +1,390 @@
+// SQLite variant of the schema — for local development without a Postgres server.
+// To use:
+//   1. Copy this file over schema.prisma:  cp prisma/schema.sqlite.prisma prisma/schema.prisma
+//   2. In .env.local, set:  DATABASE_URL="file:./dev.db"
+//   3. Run:  node node_modules/prisma/build/index.js db push
+// For production, switch back to the PostgreSQL schema (git checkout prisma/schema.prisma)
+// and use Supabase or Neon for the database.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  emailVerified   DateTime?
+  name            String?
+  image           String?
+  hashedPassword  String?
+  role            String    @default("CLIENT")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  accounts        Account[]
+  sessions        Session[]
+  clientProfile   ClientProfile?
+  expertProfile   ExpertProfile?
+  ordersAsClient  Order[]        @relation("ClientOrders")
+  ordersAsExpert  Order[]        @relation("ExpertOrders")
+  messages        Message[]
+  reviewsGiven    Review[]       @relation("ReviewAuthor")
+  reviewsReceived Review[]       @relation("ReviewTarget")
+  attachments     Attachment[]
+  disputes        Dispute[]      @relation("DisputeOpener")
+  blogPosts       BlogPost[]
+  faqs            Faq[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model ClientProfile {
+  id                     String   @id @default(cuid())
+  userId                 String   @unique
+  company                String?
+  country                String?
+  defaultPaymentMethodId String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ExpertProfile {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  bio           String?
+  headline      String?
+  hourlyRate    Float?
+  currency      String   @default("USD")
+  expertise     String
+  languages     String   @default("English")
+  education     String?
+  yearsExp      Int?
+  status        String   @default("PENDING")
+  rating        Float    @default(0)
+  completedJobs Int      @default(0)
+  cvUrl         String?
+  sampleWorkUrl String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Discipline {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String
+  longDescription String?
+  icon        String?
+  tools       String?
+  servicesList String?
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  parentId String?
+  parent   Discipline?  @relation("SubDisciplines", fields: [parentId], references: [id])
+  children Discipline[] @relation("SubDisciplines")
+  services Service[]
+}
+
+model Service {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  name          String
+  description   String
+  shortDescription String?
+  category      String
+  icon          String?
+
+  // Per-page pricing
+  pricePerPage  Float    @default(0)
+  minPages      Int      @default(1)
+  maxPages      Int?
+  pageUnit      String   @default("page") // "page" (250 words), "slide", "sheet", "minute", "hour"
+  wordsPerPage  Int      @default(250)
+
+  // Optional flat base / rush
+  basePrice     Float?
+  rushMultiplier Float   @default(1.5)
+
+  deliverables  String?
+  turnaroundDays Int     @default(7)
+  active        Boolean  @default(true)
+  featured      Boolean  @default(false)
+  order         Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  disciplineId String?
+  discipline   Discipline? @relation(fields: [disciplineId], references: [id])
+  orders       Order[]
+}
+
+model Order {
+  id         String   @id @default(cuid())
+  clientId   String
+  expertId   String?
+  serviceId  String?
+  title      String
+  brief      String
+  pageCount  Int?
+  deadline   DateTime?
+  budget     Float?
+  status     String   @default("DRAFT")
+  finalPrice Float?
+  currency   String   @default("USD")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  client      User        @relation("ClientOrders", fields: [clientId], references: [id])
+  expert      User?       @relation("ExpertOrders", fields: [expertId], references: [id])
+  service     Service?    @relation(fields: [serviceId], references: [id])
+  payments    Payment[]
+  messages    Message[]
+  reviews     Review[]
+  dispute     Dispute?
+  attachments Attachment[]
+}
+
+model Payment {
+  id         String   @id @default(cuid())
+  orderId    String
+  gateway    String
+  amount     Float
+  currency   String   @default("USD")
+  status     String   @default("PENDING")
+  gatewayRef String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  orderId    String
+  fromUserId String
+  toUserId   String
+  rating     Int
+  comment    String?
+  createdAt  DateTime @default(now())
+
+  order    Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  fromUser User  @relation("ReviewAuthor", fields: [fromUserId], references: [id])
+  toUser   User  @relation("ReviewTarget", fields: [toUserId], references: [id])
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  orderId    String
+  fromUserId String
+  body       String
+  createdAt  DateTime @default(now())
+
+  order       Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  fromUser    User         @relation(fields: [fromUserId], references: [id])
+  attachments Attachment[]
+}
+
+model Attachment {
+  id        String   @id @default(cuid())
+  ownerId   String
+  url       String
+  filename  String
+  size      Int
+  mimeType  String
+  createdAt DateTime @default(now())
+
+  owner     User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  order     Order?    @relation(fields: [orderId], references: [id])
+  orderId   String?
+  message   Message?  @relation(fields: [messageId], references: [id])
+  messageId String?
+}
+
+model Dispute {
+  id         String   @id @default(cuid())
+  orderId    String   @unique
+  openedById String
+  reason     String
+  status     String   @default("OPEN")
+  resolution String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  order    Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  openedBy User  @relation("DisputeOpener", fields: [openedById], references: [id])
+}
+
+model ContactSubmission {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  createdAt DateTime @default(now())
+}
+
+model ExpertApplication {
+  id            String   @id @default(cuid())
+  name          String
+  email         String
+  phone         String?
+  expertise     String
+  bio           String
+  hourlyRate    Float?
+  currency      String   @default("USD")
+  cvUrl         String?
+  sampleWorkUrl String?
+  status        String   @default("PENDING")
+  createdAt     DateTime @default(now())
+}
+
+model QuoteRequest {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  projectType String
+  scope       String
+  budget      String
+  createdAt   DateTime @default(now())
+}
+
+model Testimonial {
+  id         String   @id @default(cuid())
+  name       String
+  role       String
+  country    String?
+  quote      String
+  rating     Int      @default(5)
+  avatarSeed Int?
+  order      Int      @default(0)
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  name      String
+  role      String
+  bio       String
+  avatarSeed Int?
+  order     Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Faq {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String
+  category  String   @default("General")
+  order     Int      @default(0)
+  active    Boolean  @default(true)
+  authorId  String?
+  author    User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  excerpt     String
+  body        String
+  category    String   @default("General")
+  image       String?
+  readTime    String   @default("5 min")
+  authorId    String?
+  author      User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  published   Boolean  @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PricingTier {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  blurb       String
+  // Tier-level pricing
+  pricePerPage Float?
+  minPages     Int      @default(1)
+  includedPages Int?
+  // Fallback flat price (used when no per-page)
+  flatPrice   Float?
+  features    String
+  ctaLabel    String   @default("Get started")
+  ctaHref     String   @default("/dashboard/new")
+  featured    Boolean  @default(false)
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PricingConfig {
+  id              String   @id @default(cuid())
+  pageUnitLabel   String   @default("page")
+  wordsPerPage    Int      @default(250)
+  platformFeePercent Float @default(15)
+  rushDeliveryDays Int     @default(3)
+  rushMultiplier  Float    @default(1.5)
+  studentDiscountPercent Float @default(10)
+  nonProfitDiscountPercent Float @default(10)
+  updatedAt       DateTime @updatedAt
+  singleton       String   @unique @default("singleton")
+}
+
+model SiteStat {
+  id        String   @id @default(cuid())
+  label     String   @unique
+  value     String
+  order     Int      @default(0)
+  updatedAt DateTime @updatedAt
+}

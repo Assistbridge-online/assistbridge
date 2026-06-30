@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #ffffff;
+    --foreground: #0f172a;
+    --font-inter: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { border-color: #e2e8f0; }
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+  html[data-scroll-behavior="smooth"] {
+    scroll-behavior: smooth;
+  }
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-inter);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  ::selection { background-color: #dbeafe; color: #1e3a8a; }
+}
+
+@layer utilities {
+  .gradient-text {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #06b6d4 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .gradient-bg {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #06b6d4 100%);
+  }
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(37, 99, 235, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(37, 99, 235, 0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  .dot-bg {
+    background-image: radial-gradient(rgba(37, 99, 235, 0.12) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  .glow {
+    box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.08), 0 12px 40px -8px rgba(37, 99, 235, 0.18);
+  }
+  .container-x {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+  @media (min-width: 768px) {
+    .container-x { padding-left: 2rem; padding-right: 2rem; }
+  }
+  .animate-marquee {
+    animation: marquee 40s linear infinite;
+  }
+  .animate-marquee:hover {
+    animation-play-state: paused;
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-33.3333%); }
+  }
+  .animate-testimonial-marquee {
+    animation: testimonial-marquee 50s linear infinite;
+  }
+  .animate-testimonial-marquee:hover {
+    animation-play-state: paused;
+  }
+  @keyframes testimonial-marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-33.3333%); }
+  }
+  @keyframes hero-underline-wave {
+    0%   { d: path("M2 5 Q 50 1, 100 4 T 198 3"); }
+    25%  { d: path("M2 5 Q 50 4, 100 2 T 198 4"); }
+    50%  { d: path("M2 5 Q 50 2, 100 5 T 198 3"); }
+    75%  { d: path("M2 5 Q 50 3, 100 3 T 198 5"); }
+    100% { d: path("M2 5 Q 50 1, 100 4 T 198 3"); }
+  }
+  .animate-hero-underline path {
+    animation: hero-underline-wave 5s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-marquee,
+    .animate-testimonial-marquee,
+    .animate-hero-underline path { animation: none; }
+  }
+}
