@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import Script from "next/script";
 import "./globals.css";
 import { Toaster } from "sonner";
+import { Analytics } from "@vercel/analytics/next";
 import { CookieConsent } from "@/components/cookie-consent";
 import { NavigationProgress } from "@/components/navigation-progress";
 import { siteConfig } from "@/lib/site";
@@ -99,6 +100,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <Toaster position="top-right" richColors closeButton />
         <CookieConsent />
+        <Analytics />
       </body>
     </html>
   );
