@@ -346,10 +346,6 @@ export async function registerAfterPayment(sessionId: string, name: string, emai
   return {
     ok: true as const,
     email: email.toLowerCase(),
-    sessionId,
-    name,
-    password,
-    code,
   };
 }
 
@@ -428,11 +424,15 @@ export async function confirmVerificationCode(email: string, code: string, name:
     },
   });
 
-  return {
-    ok: true as const,
-    redirectTo: `/dashboard/orders/${order.id}`,
+  // Set session cookie server-side (works in server action context)
+  await signIn("credentials", {
     email: email.toLowerCase(),
-  };
+    password,
+    redirect: false,
+  });
+
+  // Redirect to dashboard (Next.js handles this client-side automatically)
+  redirect(`/dashboard/orders/${order.id}`);
 }
 
 export async function resendVerificationCode(email: string) {
