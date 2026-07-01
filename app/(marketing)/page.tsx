@@ -114,7 +114,10 @@ export default async function HomePage() {
           <div className="max-w-[1440px] mx-auto grid lg:grid-cols-[1fr_1.25fr] gap-10 items-stretch">
             <div className="animate-fade-in flex flex-col justify-center h-full lg:pl-10">
               <h1 className="text-[2.5rem] sm:text-5xl lg:text-[3.5rem] xl:text-6xl font-bold tracking-tight text-slate-900 leading-[1.1]">
-                The expert
+                AssistBridge:
+                <span className="block sm:inline">
+                  {" "}the expert
+                </span>
                 <br className="hidden sm:block" />{" "}
                 <span>
                   you need,{" "}
