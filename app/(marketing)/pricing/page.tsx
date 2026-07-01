@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PriceCalculator } from "@/components/price-calculator";
 import { getActiveAcademicLevels, getActiveFaqs, getActiveServices, getActiveSubjects } from "@/lib/content";
-import { saveCalculatorOrder } from "@/lib/actions/orders";
+import { createCheckoutAction } from "@/lib/actions/checkout";
 
 export const dynamic = "force-dynamic";
 
@@ -72,9 +72,9 @@ export default async function PricingPage() {
                   description: s.description,
                   priceMultiplier: s.priceMultiplier,
                 }))}
-                action={saveCalculatorOrder}
+                action={createCheckoutAction}
                 requireAuth={false}
-                ctaLabel="Save order and continue"
+                ctaLabel="Continue to payment →"
                 themed
               />
             </div>

@@ -269,6 +269,9 @@ export async function createCheckoutAction(formData: FormData) {
   const pages = parseInt(formData.get("pages") as string, 10);
   const price = parseFloat(formData.get("quotedPrice") as string);
 
+  if (!process.env.STRIPE_SECRET_KEY) {
+    return { ok: false, error: "Stripe is not configured. Please set STRIPE_SECRET_KEY." };
+  }
   const stripe = getStripe();
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
