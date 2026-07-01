@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body style="margin:0;padding:0;background:#f4f5f7;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f5f7;padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
+
+          <!-- Logo -->
+          <tr>
+            <td align="center" style="padding-bottom:24px;">
+              <img src="https://assistbridge.online/assistbridge-logo.png" alt="AssistBridge" width="180" style="display:block;border:0;">
+            </td>
+          </tr>
+
+          <!-- Card -->
+          <tr>
+            <td style="background:#ffffff;border-radius:12px;padding:40px 32px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+
+              <!-- Title -->
+              <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#0f172a;text-align:center;">
+                Verify your email
+              </h1>
+              <p style="margin:0 0 24px;font-size:15px;color:#64748b;text-align:center;line-height:1.5;">
+                Your payment was successful. Use the code below to verify your email and create your account.
+              </p>
+
+              <!-- Code -->
+              <div style="background:#f1f5f9;border-radius:10px;padding:20px;text-align:center;margin-bottom:24px;">
+                <p style="margin:0 0 4px;font-size:12px;color:#94a3b8;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;">
+                  Verification code
+                </p>
+                <p style="margin:0;font-size:36px;font-weight:800;color:#059669;letter-spacing:10px;font-family:'Courier New',Courier,monospace;">
+                  {{code}}
+                </p>
+              </div>
+
+              <p style="margin:0 0 4px;font-size:14px;color:#475569;text-align:center;">
+                This code expires in <strong style="color:#0f172a;">10 minutes</strong>.
+              </p>
+              <p style="margin:0 0 28px;font-size:14px;color:#475569;text-align:center;">
+                After verification, you will be logged in automatically.
+              </p>
+
+              <!-- Button -->
+              <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+                <tr>
+                  <td align="center" style="background:#059669;border-radius:8px;padding:0;">
+                    <a href="{{verifyUrl}}" style="display:inline-block;padding:13px 32px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;background:#059669;border-radius:8px;">
+                      Verify email
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="padding-top:24px;">
+              <p style="margin:0 0 4px;font-size:12px;color:#94a3b8;">
+                AssistBridge &mdash; Research &amp; Technical Assistance
+              </p>
+              <p style="margin:0;font-size:12px;color:#94a3b8;">
+                Need help? <a href="mailto:info@assistbridge.online" style="color:#059669;text-decoration:underline;">info@assistbridge.online</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
