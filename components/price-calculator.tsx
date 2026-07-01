@@ -235,7 +235,7 @@ export function PriceCalculator({
       if (cloudLinks.length > 0) formData.set("cloudLinks", JSON.stringify(cloudLinks));
       const result = await action(formData);
       if (result.ok && result.redirect) {
-        router.push(result.redirect);
+        window.location.href = result.redirect;
       } else if (!result.ok) {
         setError(result.error ?? "Something went wrong");
       }
