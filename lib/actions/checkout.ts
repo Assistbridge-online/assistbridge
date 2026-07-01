@@ -282,7 +282,7 @@ export async function createCheckoutAction(formData: FormData) {
       quantity: 1,
     }],
     success_url: `${getBaseUrl()}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${getBaseUrl()}/calculator`,
+    cancel_url: `${getBaseUrl()}/pricing`,
     metadata: {
       title, brief, serviceSlug, levelSlug, subject, deadlineAt,
       pages: pages.toString(),
