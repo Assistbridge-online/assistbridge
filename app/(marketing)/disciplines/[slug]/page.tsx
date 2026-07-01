@@ -71,7 +71,7 @@ export default async function DisciplinePage({ params }: { params: Promise<{ slu
 
                 <div className="mt-7 flex flex-wrap gap-3">
                   <Button asChild size="lg">
-                    <Link href="/dashboard/new">Request help in {discipline.name} <ArrowRight className="h-4 w-4" /></Link>
+                    <Link href="/calculator">Request help in {discipline.name} <ArrowRight className="h-4 w-4" /></Link>
                   </Button>
                   <Button asChild size="lg" variant="outline">
                     <Link href={`/experts`}>Browse {discipline.name.toLowerCase()} experts</Link>
@@ -145,7 +145,7 @@ export default async function DisciplinePage({ params }: { params: Promise<{ slu
                     Describe your task and we will match you with a {discipline.name.toLowerCase()} expert within 24 hours.
                   </p>
                   <Button asChild className="mt-5 w-full bg-emerald-600 hover:bg-emerald-500 text-white">
-                    <Link href="/dashboard/new">Request Assistance</Link>
+                    <Link href="/calculator">Request Assistance</Link>
                   </Button>
                 </Card>
               </div>
@@ -214,15 +214,15 @@ export default async function DisciplinePage({ params }: { params: Promise<{ slu
                   Get matched with an expert today.
                 </h2>
                 <p className="mt-4 text-base text-slate-300 max-w-xl leading-relaxed">
-                  Post a brief, get matched with a vetted {discipline.name.toLowerCase()} specialist,
+                  Post a project, get matched with a vetted {discipline.name.toLowerCase()} specialist,
                   and start collaborating within hours.
                 </p>
                 <div className="mt-7 flex flex-wrap gap-3">
                   <Link
-                    href="/dashboard/new"
+                    href="/calculator"
                     className="group inline-flex items-center gap-2 h-12 px-6 rounded-lg bg-white text-slate-900 text-[15px] font-semibold hover:bg-emerald-50 transition-colors"
                   >
-                    Post a brief <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    Post a project <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                   <Link
                     href="/pricing"
@@ -248,3 +248,4 @@ export default async function DisciplinePage({ params }: { params: Promise<{ slu
     </>
   );
 }
+

@@ -88,7 +88,7 @@ export default async function DisciplinesPage() {
               </Link>
             ))}
             <Link
-              href="/dashboard/new"
+              href="/calculator"
               className="group flex items-start gap-4 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 p-4 transition-all hover:border-emerald-400 hover:bg-emerald-50 hover:shadow-md"
             >
               <div className="h-11 w-11 rounded-lg bg-slate-200 text-slate-500 group-hover:bg-emerald-100 group-hover:text-emerald-700 flex items-center justify-center shrink-0 transition-all">
@@ -96,7 +96,7 @@ export default async function DisciplinesPage() {
               </div>
               <div className="min-w-0 flex-1">
                 <div className="text-sm font-bold text-slate-700 group-hover:text-emerald-800 transition-colors">Don&apos;t see your discipline?</div>
-                <div className="mt-0.5 text-xs text-slate-500 leading-relaxed">Post a brief and we&apos;ll find an expert within 24 hours.</div>
+                <div className="mt-0.5 text-xs text-slate-500 leading-relaxed">Post a project and we&apos;ll find an expert within 24 hours.</div>
               </div>
               <ArrowRight className="h-4 w-4 text-slate-300 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all shrink-0 mt-1" />
             </Link>
@@ -137,7 +137,7 @@ export default async function DisciplinesPage() {
                   { i: <Globe className="h-5 w-5" />, t: "Worldwide coverage", d: "Serving clients across 60+ countries with multi-currency support." },
                   { i: <Clock className="h-5 w-5" />, t: "Match in hours", d: "Most briefs get matched with a qualified expert within 4 hours." },
                   { i: <Award className="h-5 w-5" />, t: "Publication-ready", d: "Work meets academic and professional standards. 14-day revision window." },
-                  { i: <Sparkles className="h-5 w-5" />, t: "No commitment", d: "Post a brief for free. Pay only when you accept the quote." },
+                  { i: <Sparkles className="h-5 w-5" />, t: "No commitment", d: "Post a project for free. Pay only when you accept the quote." },
                 ].map((f) => (
                   <div key={f.t} className="flex items-start gap-3">
                     <div className="h-9 w-9 rounded-lg bg-slate-900 text-white flex items-center justify-center shrink-0">
@@ -170,15 +170,15 @@ export default async function DisciplinesPage() {
                   We add new disciplines every month.
                 </h2>
                 <p className="mt-4 text-base text-slate-300 max-w-xl leading-relaxed">
-                  If your project falls outside our listed disciplines, post a brief with a
+                  If your project falls outside our listed disciplines, Post a project with a
                   description and we will find an expert for you, usually within 24 hours.
                 </p>
                 <div className="mt-7 flex flex-wrap gap-3">
                   <Link
-                    href="/dashboard/new"
+                    href="/calculator"
                     className="group inline-flex items-center gap-2 h-12 px-6 rounded-lg bg-white text-slate-900 text-[15px] font-semibold hover:bg-emerald-50 transition-colors"
                   >
-                    Post a brief <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    Post a project <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                   <Link
                     href="/contact"
@@ -204,3 +204,4 @@ export default async function DisciplinesPage() {
     </>
   );
 }
+

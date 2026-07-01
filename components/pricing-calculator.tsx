@@ -176,7 +176,7 @@ export function PricingCalculator({
           size="sm"
         >
           <Link
-            href={`/dashboard/new?service=${serviceId}&pages=${pages}&deadline=${encodeURIComponent(deadlineDate)}&time=${encodeURIComponent(deadlineTime)}`}
+            href={`/calculator?service=${serviceId}&pages=${pages}&deadline=${encodeURIComponent(deadlineDate)}&time=${encodeURIComponent(deadlineTime)}`}
           >
             <span className="text-sm">Request</span>
           </Link>
@@ -185,3 +185,5 @@ export function PricingCalculator({
     </Card>
   );
 }
+
+

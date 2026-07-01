@@ -147,7 +147,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
                 </h2>
                 <ol className="mt-6 space-y-3">
                   {[
-                    { t: "Post a brief with your task details", d: "Tell us what you need. The more context, the better the match." },
+                    { t: "Post a project with your task details", d: "Tell us what you need. The more context, the better the match." },
                     { t: "Get a transparent quote from an expert", d: "Within hours, you receive a quote with a clear price and timeline." },
                     { t: "Pay securely and collaborate in-platform", d: "Message, share files, and request revisions from your dashboard." },
                     { t: "Approve and release payment", d: "When you are happy with the work, payment releases to the expert." },
@@ -255,12 +255,12 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
                   Ready to request {service.name}?
                 </h2>
                 <p className="mt-4 text-base text-slate-300 max-w-xl leading-relaxed">
-                  Post a brief and we will match you with a vetted expert within hours.
+                  Post a project and we will match you with a vetted expert within hours.
                   You only pay when you approve the work.
                 </p>
                 <div className="mt-7 flex flex-wrap gap-3">
                   <Link
-                    href={`/dashboard/new?service=${service.slug}`}
+                    href={`/calculator?service=${service.slug}`}
                     className="group inline-flex items-center gap-2 h-12 px-6 rounded-lg bg-white text-slate-900 text-[15px] font-semibold hover:bg-emerald-50 transition-colors"
                   >
                     Request this service <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -293,3 +293,4 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
 function sl(name: string) {
   return name.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
 }
+

@@ -17,7 +17,7 @@ const steps = [
   {
     n: "01",
     icon: FileCheck,
-    title: "Post your brief",
+    title: "Post your project",
     description:
       "Describe what you need. The task, the deadline, your budget range, any reference materials. The more context you give, the better we can match you with the right expert.",
     actions: ["Fill the request form", "Attach reference files", "Set your budget range"],
@@ -101,7 +101,7 @@ export default function HowItWorksPage() {
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Button asChild size="lg">
-                <Link href="/dashboard/new"><span className="inline-flex items-center gap-2">Post a brief <ArrowRight className="h-4 w-4" /></span></Link>
+                <Link href="/calculator"><span className="inline-flex items-center gap-2">Post a project <ArrowRight className="h-4 w-4" /></span></Link>
               </Button>
               <Button asChild size="lg" variant="outline"><Link href="/pricing"><span>See pricing</span></Link></Button>
             </div>
@@ -115,7 +115,7 @@ export default function HowItWorksPage() {
           <div className="max-w-3xl mb-12">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Step by step</p>
             <h2 className="mt-3 text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 leading-[1.1]">
-              Here is exactly what happens after you hit Post a brief.
+              Here is exactly what happens after you hit Post a project.
             </h2>
           </div>
 
@@ -214,7 +214,7 @@ export default function HowItWorksPage() {
               Common questions about the process.
             </h2>
             <p className="mt-3 text-base text-slate-600 leading-relaxed">
-              Everything you need to know before posting a brief. Can not find what you are looking
+              Everything you need to know before posting a project. Can not find what you are looking
               for? <Link href="/contact" className="text-emerald-700 font-semibold hover:text-emerald-800">Contact our team</Link>.
             </p>
           </div>
@@ -237,15 +237,15 @@ export default function HowItWorksPage() {
                   Ready to see how it works for you?
                 </h2>
                 <p className="mt-4 text-base text-slate-300 max-w-xl leading-relaxed">
-                  Post your first brief in under five minutes. No credit card required, no commitment.
+                  Post your first project in under five minutes. No credit card required, no commitment.
                   Just describe what you need and we will take it from there.
                 </p>
                 <div className="mt-7 flex flex-wrap gap-3">
                   <Link
-                    href="/dashboard/new"
+                    href="/calculator"
                     className="group inline-flex items-center gap-2 h-12 px-6 rounded-lg bg-white text-slate-900 text-[15px] font-semibold hover:bg-emerald-50 transition-colors"
                   >
-                    Post a brief <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    Post a project <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                   <Link
                     href="/experts"
@@ -271,3 +271,5 @@ export default function HowItWorksPage() {
     </>
   );
 }
+
+

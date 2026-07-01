@@ -94,7 +94,7 @@ export default async function ServicesPage() {
               </p>
               <div className="mt-7 flex flex-wrap gap-3">
                 <Button asChild size="lg">
-                  <Link href="/dashboard/new"><span className="inline-flex items-center gap-2">Post a brief <ArrowRight className="h-4 w-4" /></span></Link>
+                  <Link href="/calculator"><span className="inline-flex items-center gap-2">Post a project <ArrowRight className="h-4 w-4" /></span></Link>
                 </Button>
                 <Button asChild size="lg" variant="outline"><Link href="/pricing"><span>See pricing</span></Link></Button>
               </div>
@@ -241,7 +241,7 @@ export default async function ServicesPage() {
               How our services work.
             </h2>
             <p className="mt-3 text-base text-slate-600 leading-relaxed">
-              Every service follows the same clear process. Post a brief, get matched with a vetted
+              Every service follows the same clear process. Post a project, get matched with a vetted
               expert, collaborate in-platform, and release payment when you are happy with the work.
             </p>
           </div>
@@ -350,10 +350,10 @@ export default async function ServicesPage() {
                 </p>
                 <div className="mt-7 flex flex-wrap gap-3">
                   <Link
-                    href="/dashboard/new"
+                    href="/calculator"
                     className="group inline-flex items-center gap-2 h-12 px-6 rounded-lg bg-white text-slate-900 text-[15px] font-semibold hover:bg-emerald-50 transition-colors"
                   >
-                    Post a brief <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    Post a project <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                   <Link
                     href="/contact"
@@ -379,3 +379,4 @@ export default async function ServicesPage() {
     </>
   );
 }
+

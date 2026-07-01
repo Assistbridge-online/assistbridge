@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 export default async function NewOrderPage() {
   const session = await auth();
-  if (!session?.user) redirect("/login?returnTo=/dashboard/new");
+  if (!session?.user) redirect("/login?returnTo=/calculator");
 
   const [services, levels] = await Promise.all([
     getActiveServices(),
@@ -19,7 +19,7 @@ export default async function NewOrderPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Post a new brief</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Post a new project</h1>
         <p className="mt-1 text-sm text-slate-600">
           Fill in the details below and see the price in real time. You can save the order
           and upload files before checkout.
@@ -78,3 +78,5 @@ export default async function NewOrderPage() {
     </div>
   );
 }
+
+

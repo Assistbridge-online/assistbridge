@@ -53,7 +53,7 @@ export default async function HomePage() {
       n: "01",
       icon: FileCheck,
       iconBg: "bg-emerald-100 text-emerald-700",
-      t: "Post your brief",
+      t: "Post your project",
       d: "Describe what you need, the deadline, your budget, and any reference files. The more context, the better the match.",
       points: ["Structured brief form", "Attach reference files", "Set deadline and budget"],
       img: "https://images.unsplash.com/photo-1517842645767-c639042777db?w=900&q=80",
@@ -172,10 +172,10 @@ export default async function HomePage() {
 
               <div className="mt-7 flex flex-col sm:flex-row gap-3">
                 <Link
-                  href="/dashboard/new"
+                  href="/calculator"
                   className="group inline-flex items-center justify-center gap-2 h-12 px-6 rounded-lg bg-slate-900 text-white text-[15px] font-semibold shadow-sm shadow-slate-900/10 hover:bg-primary-800 hover:shadow-lg hover:shadow-primary-700/30 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2"
                 >
-                  <span>Post a brief</span>
+                  <span>Post a project</span>
                   <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
                 </Link>
                 <Link
@@ -528,16 +528,16 @@ export default async function HomePage() {
                   Ready when you are. No commitment, no card.
                 </h2>
                 <p className="mt-4 text-base text-slate-300 max-w-xl leading-relaxed">
-                  Post your first brief in under five minutes. Get matched with a vetted
+                  Post your first project in under five minutes. Get matched with a vetted
                   expert, pay securely through Stripe or PayPal, and release payment only when the
                   work is done.
                 </p>
                 <div className="mt-7 flex flex-wrap gap-3">
                   <Link
-                    href="/dashboard/new"
+                    href="/calculator"
                     className="group inline-flex items-center gap-2 h-12 px-6 rounded-lg bg-white text-slate-900 text-[15px] font-semibold hover:bg-emerald-50 transition-colors"
                   >
-                    Post your first brief <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    Post your first project <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                   <Link
                     href="/pricing"
@@ -563,3 +563,5 @@ export default async function HomePage() {
     </>
   );
 }
+
+

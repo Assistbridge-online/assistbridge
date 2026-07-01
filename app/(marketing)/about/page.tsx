@@ -416,10 +416,10 @@ export default async function AboutPage() {
                 </p>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <Link
-                    href="/dashboard/new"
+                    href="/calculator"
                     className="group inline-flex items-center gap-2 h-12 px-6 rounded-lg bg-white text-slate-900 text-[15px] font-semibold hover:bg-emerald-50 transition-colors"
                   >
-                    Post a brief <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    Post a project <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                   <Link
                     href="/become-an-expert"
@@ -445,3 +445,5 @@ export default async function AboutPage() {
     </>
   );
 }
+
+

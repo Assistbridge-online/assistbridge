@@ -246,13 +246,13 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
             <Card className="p-5 bg-gradient-to-br from-emerald-50/60 via-white to-emerald-50/30 border-emerald-200/60">
               <p className="text-xs uppercase tracking-wider text-emerald-700 font-semibold">Get expert help</p>
               <p className="mt-2 text-sm text-slate-700">
-                Post your brief and we&apos;ll match you with a vetted specialist. Pay only when you approve the work.
+                Post your project and we&apos;ll match you with a vetted specialist. Pay only when you approve the work.
               </p>
               <Link
-                href="/dashboard/new"
+                href="/calculator"
                 className="mt-4 inline-flex items-center justify-center w-full h-9 rounded-md bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition-colors"
               >
-                Post a brief
+                Post a project
               </Link>
             </Card>
 
@@ -447,3 +447,4 @@ function Pagination({
     </div>
   );
 }
+

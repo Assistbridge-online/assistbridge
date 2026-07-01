@@ -166,7 +166,7 @@ export default async function ExpertProfilePage({ params }: { params: Promise<{ 
             {/* ===================== ACTIONS ===================== */}
             <div className="lg:col-span-3 flex flex-col gap-2">
               <Button asChild size="lg" className="w-full">
-                <Link href="/dashboard/new">
+                <Link href="/calculator">
                   Hire {e.name.split(" ")[0]} <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
@@ -307,7 +307,7 @@ export default async function ExpertProfilePage({ params }: { params: Promise<{ 
                 a few hours.
               </p>
               <Link
-                href="/dashboard/new"
+                href="/calculator"
                 className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-emerald-300 hover:text-emerald-200"
               >
                 Start a project <ArrowRight className="h-3.5 w-3.5" />
@@ -371,3 +371,4 @@ export default async function ExpertProfilePage({ params }: { params: Promise<{ 
     </>
   );
 }
+

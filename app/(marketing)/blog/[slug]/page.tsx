@@ -182,13 +182,13 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                   Need this done?
                 </p>
                 <p className="mt-2 text-sm text-slate-700">
-                  Post your brief and we&apos;ll match you with a vetted specialist.
+                  Post your project and we&apos;ll match you with a vetted specialist.
                 </p>
                 <Link
-                  href="/dashboard/new"
+                  href="/calculator"
                   className="mt-4 inline-flex items-center justify-center w-full h-9 rounded-md bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition-colors"
                 >
-                  Post a brief
+                  Post a project
                 </Link>
               </Card>
               <Card className="p-5">
@@ -301,3 +301,4 @@ function renderInline(text: string): React.ReactNode {
     return <span>{text}</span>;
   }
 }
+
