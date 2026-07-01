@@ -2,6 +2,7 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, Suspense } from "react";
+import { signIn } from "next-auth/react";
 import { Mail, Lock, User, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -145,6 +146,9 @@ function VerifyCodeStep({
       const nextInput = document.getElementById(`code-${i + 1}`);
       nextInput?.focus();
     }
+    if (v && next.every((d) => d !== "") && !loading) {
+      submitCode(next.join(""));
+    }
   }
 
   function handleKeyDown(i: number, e: React.KeyboardEvent) {
@@ -156,7 +160,11 @@ function VerifyCodeStep({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const fullCode = code.join("");
+    await submitCode(code.join(""));
+  }
+
+  async function submitCode(fullCode: string) {
+    if (loading) return;
     if (fullCode.length !== 6) { setError("Please enter the full 6-digit code."); return; }
     setLoading(true);
     setError("");
@@ -169,6 +177,16 @@ function VerifyCodeStep({
       });
       const data = await res.json();
       if (!data.ok) { setError(data.error); setLoading(false); return; }
+      const signInResult = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+      if (signInResult?.error) {
+        setError("Account created but auto-login failed. Please sign in manually.");
+        setLoading(false);
+        return;
+      }
       window.location.href = data.redirectTo;
     } catch {
       setError("Something went wrong. Please try again.");

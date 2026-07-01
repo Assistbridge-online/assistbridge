@@ -428,17 +428,11 @@ export async function confirmVerificationCode(email: string, code: string, name:
     },
   });
 
-  try {
-    await signIn("credentials", {
-      email: email.toLowerCase(),
-      password,
-      redirect: false,
-    });
-  } catch {
-    /* signIn will be called client-side after redirect */
-  }
-
-  return { ok: true as const, redirectTo: `/dashboard/orders/${order.id}` };
+  return {
+    ok: true as const,
+    redirectTo: `/dashboard/orders/${order.id}`,
+    email: email.toLowerCase(),
+  };
 }
 
 export async function resendVerificationCode(email: string) {
