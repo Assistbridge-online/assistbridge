@@ -52,6 +52,16 @@ export const DISCIPLINES = [
   "Environment & Agriculture",
   "Communications & Media",
   "Architecture & Construction",
+  "Biotechnology & Biomedical Engineering",
+  "Data Science & Artificial Intelligence",
+  "Cybersecurity & Information Assurance",
+  "Aerospace & Aviation",
+  "Neuroscience & Cognitive Science",
+  "Pharmaceutical Sciences",
+  "Sports & Exercise Science",
+  "Energy & Sustainable Development",
+  "Materials Science & Nanotechnology",
+  "Robotics & Automation",
 ] as const;
 
 export const SERVICE_CATEGORIES = [

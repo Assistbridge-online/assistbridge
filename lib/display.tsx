@@ -1,11 +1,13 @@
 import {
   Microscope, Stethoscope, Briefcase, Code2, PenLine, Award, Sparkles,
   Users, Calculator, Globe, Wrench, HelpCircle,
+  FlaskConical, Cpu, Shield, Rocket, Brain, Pill, Heart, Leaf, Diamond, Atom,
 } from "lucide-react";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Microscope, Stethoscope, Briefcase, Code2, PenLine, Award, Sparkles,
   Users, Calculator, Globe, Wrench,
+  FlaskConical, Cpu, Shield, Rocket, Brain, Pill, Heart, Leaf, Diamond, Atom,
 };
 
 export function DisciplineIcon({ name, className }: { name: string | null | undefined; className?: string }) {
