@@ -3,7 +3,7 @@ export const siteConfig = {
   legalName: "AssistBridge LLC",
   tagline: "Research & Technical Assistance",
   description:
-    "AssistBridge connects you with vetted experts for research, technical, and academic assistance across every discipline. From data analysis to engineering, get the help you need, on demand.",
+    "AssistBridge connects you with vetted experts for research, technical, and academic help across every discipline — on demand.",
   url: "https://assistbridge.online",
   ogImage: "/assistbridge-logo.png",
   email: "info@assistbridge.online",
