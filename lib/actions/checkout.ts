@@ -29,7 +29,13 @@ export type CheckoutData = {
 };
 
 function getBaseUrl(): string {
-  return process.env.NEXTAUTH_URL || process.env.AUTH_URL || "http://localhost:3000";
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return process.env.NEXTAUTH_URL || process.env.AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 }
 
 function generateCode(): string {
