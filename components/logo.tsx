@@ -44,10 +44,7 @@ export function Logo({ className, variant = "default", width = 200 }: LogoProps)
         alt="AssistBridge"
         fill
         sizes={`${width}px`}
-        className={cn(
-          "object-contain",
-          variant === "white" && "brightness-0 invert"
-        )}
+        className="object-contain"
         priority
       />
     </div>
