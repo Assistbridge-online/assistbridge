@@ -4,7 +4,7 @@ import { ArrowRight, Check, Calculator, GraduationCap, Clock, FileText } from "l
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PriceCalculator } from "@/components/price-calculator";
-import { saveCalculatorOrder } from "@/lib/actions/orders";
+import { createCheckoutAction } from "@/lib/actions/checkout";
 import { getActiveServices, getActiveAcademicLevels, getActiveSubjects } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
@@ -118,9 +118,9 @@ export default async function CalculatorPage() {
                   description: s.description,
                   priceMultiplier: s.priceMultiplier,
                 }))}
-                action={saveCalculatorOrder}
+                action={createCheckoutAction}
                 requireAuth={false}
-                ctaLabel="Save order and continue"
+                ctaLabel="Continue to payment →"
                 themed
               />
             </div>

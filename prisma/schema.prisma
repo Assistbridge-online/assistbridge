@@ -441,3 +441,14 @@ model NewsletterSubscriber {
   unsubscribedAt DateTime?
   createdAt      DateTime  @default(now())
 }
+
+model VerificationCode {
+  id        String   @id @default(cuid())
+  email     String
+  code      String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([email, code])
+}
