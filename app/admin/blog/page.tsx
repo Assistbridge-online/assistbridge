@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db";
 import { BlogManager } from "@/components/admin/blog-manager";
 
+
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Admin · Blog" };
 
 export default async function AdminBlogPage() {

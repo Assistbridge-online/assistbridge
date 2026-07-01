@@ -10,11 +10,6 @@ import { DisciplineIcon, disciplineSlug, splitPipes } from "@/lib/display";
 
 export const dynamic = "force-dynamic";
 
-export async function generateStaticParams() {
-  const disciplines = await getActiveDisciplines();
-  return disciplines.map((d) => ({ slug: disciplineSlug(d.name) }));
-}
-
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const all = await getActiveDisciplines();

@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db";
 import { ServiceManager } from "@/components/admin/service-manager";
 
+
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Admin · Services" };
 
 export default async function AdminServicesPage() {

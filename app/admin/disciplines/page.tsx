@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db";
 import { DisciplineManager } from "@/components/admin/discipline-manager";
 
+
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Admin · Disciplines" };
 
 export default async function AdminDisciplinesPage() {

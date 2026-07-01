@@ -6,6 +6,8 @@ import { Button, LinkButton } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
 import { prisma } from "@/lib/db";
 
+
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Payment successful" };
 
 export default async function PaymentSuccessPage({ params }: { params: Promise<{ id: string }> }) {

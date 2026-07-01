@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db";
 import { TestimonialManager } from "@/components/admin/testimonial-manager";
 
+
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Admin · Testimonials" };
 
 export default async function AdminTestimonialsPage() {

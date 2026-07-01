@@ -8,6 +8,8 @@ import { DISCIPLINES } from "@/lib/utils";
 import { toast } from "sonner";
 import { CheckCircle2, Upload } from "lucide-react";
 
+
+export const dynamic = "force-dynamic";
 export default function ExpertProfilePage() {
   const [profile, setProfile] = useState({
     headline: "Biostatistician · PhD",

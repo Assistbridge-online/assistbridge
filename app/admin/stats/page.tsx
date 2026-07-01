@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db";
 import { StatManager } from "@/components/admin/stat-manager";
 
+
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Admin · Site stats" };
 
 export default async function AdminStatsPage() {

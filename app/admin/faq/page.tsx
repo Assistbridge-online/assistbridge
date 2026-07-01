@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db";
 import { FaqManager } from "@/components/admin/faq-manager";
 
+
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Admin · FAQ" };
 
 export default async function AdminFaqPage() {

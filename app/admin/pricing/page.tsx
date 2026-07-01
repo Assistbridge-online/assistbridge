@@ -2,6 +2,8 @@ import { prisma } from "@/lib/db";
 import { PricingTierManager } from "@/components/admin/pricing-tier-manager";
 import { PricingConfigForm } from "@/components/admin/pricing-config-form";
 
+
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Admin · Pricing" };
 
 export default async function AdminPricingPage() {

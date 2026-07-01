@@ -11,11 +11,6 @@ import { formatCurrency } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
-export async function generateStaticParams() {
-  const services = await getActiveServices();
-  return services.map((s) => ({ slug: s.slug }));
-}
-
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const s = await getServiceBySlug(slug);

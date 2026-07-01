@@ -5,6 +5,8 @@ import { XCircle, ArrowRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button, LinkButton } from "@/components/ui/button";
 
+
+export const dynamic = "force-dynamic";
 export default function PayPalCancelPage() {
   return (
     <main className="min-h-screen flex items-center justify-center bg-slate-50 p-4">

@@ -5,6 +5,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
+
+export const dynamic = "force-dynamic";
 export default function SettingsPage() {
   const [tab, setTab] = useState("profile");
   const [profile, setProfile] = useState({ name: "Alex Morgan", email: "alex@example.com", country: "United States", company: "" });

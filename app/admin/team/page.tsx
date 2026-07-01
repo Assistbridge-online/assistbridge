@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db";
 import { TeamManager } from "@/components/admin/team-manager";
 
+
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Admin · Team" };
 
 export default async function AdminTeamPage() {

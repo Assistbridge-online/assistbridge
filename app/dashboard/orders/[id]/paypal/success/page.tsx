@@ -8,6 +8,8 @@ import { Button, LinkButton } from "@/components/ui/button";
 import { completePayPal } from "@/lib/actions/checkout";
 import { toast } from "sonner";
 
+
+export const dynamic = "force-dynamic";
 export default function PayPalSuccessPage({ params }: { params: Promise<{ id: string }> }) {
   const [orderId, setOrderId] = useState<string>("");
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");

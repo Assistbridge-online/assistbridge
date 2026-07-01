@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { OrderDetailClient } from "@/components/order-detail-client";
 
+
+export const dynamic = "force-dynamic";
 const DEMO_ORDERS: Record<string, any> = {
   "ORD-2841": {
     id: "ORD-2841", title: "Statistical analysis for climate paper", status: "IN_PROGRESS",

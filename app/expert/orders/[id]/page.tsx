@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { ExpertOrderClient } from "@/components/expert-order-client";
 
+
+export const dynamic = "force-dynamic";
 const DEMO_JOBS: Record<string, any> = {
   "ORD-2841": {
     id: "ORD-2841", title: "Statistical analysis for climate paper", status: "IN_PROGRESS",
