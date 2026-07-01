@@ -6,6 +6,7 @@ import { Toaster } from "sonner";
 import { CookieConsent } from "@/components/cookie-consent";
 import { NavigationProgress } from "@/components/navigation-progress";
 import { siteConfig } from "@/lib/site";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -66,6 +67,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <Toaster position="top-right" richColors closeButton />
         <CookieConsent />
+        <SpeedInsights />
       </body>
     </html>
   );
