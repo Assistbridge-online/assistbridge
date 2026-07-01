@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Mail, FileText, Eye, Users, Lock, Server, Globe, Baby, RefreshCw, MessageCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
-export const metadata = { title: "Privacy Policy" };
+export const metadata = { title: "Privacy Policy", description: "How AssistBridge collects, uses, and protects your personal data." };
 
 const sections = [
   {

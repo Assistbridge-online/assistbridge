@@ -14,7 +14,8 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const s = await getServiceBySlug(slug);
-  return { title: s?.name ?? "Service" };
+  if (!s) return { title: "Service not found" };
+  return { title: s.name, description: s.shortDescription ?? s.description ?? `${s.name} by AssistBridge — vetted experts.` };
 }
 
 const categoryImages: Record<string, string> = {

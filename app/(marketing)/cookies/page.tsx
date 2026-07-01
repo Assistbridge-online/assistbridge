@@ -1,7 +1,7 @@
 import { Mail, Cookie, BarChart3, Settings, Users, Shield, RefreshCw, MessageCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
-export const metadata = { title: "Cookie Policy" };
+export const metadata = { title: "Cookie Policy", description: "How AssistBridge uses cookies and similar tracking technologies." };
 
 const sections = [
   {

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Mail, UserCheck, Briefcase, CreditCard, Copyright, AlertCircle, Scale, LogOut, MessageCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
-export const metadata = { title: "Terms of Service" };
+export const metadata = { title: "Terms of Service", description: "Terms of Service for using AssistBridge. Eligibility, payments, disputes, and more." };
 
 const sections = [
   {

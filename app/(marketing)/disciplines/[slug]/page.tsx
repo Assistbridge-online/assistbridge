@@ -14,7 +14,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const all = await getActiveDisciplines();
   const d = all.find((x) => disciplineSlug(x.name) === slug);
-  return { title: d?.name ?? "Discipline" };
+  if (!d) return { title: "Discipline not found" };
+  return { title: d.name, description: `Vetted experts in ${d.name} — research, writing, data analysis, and more.` };
 }
 
 export default async function DisciplinePage({ params }: { params: Promise<{ slug: string }> }) {

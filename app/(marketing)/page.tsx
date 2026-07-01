@@ -21,6 +21,7 @@ import { Card } from "@/components/ui/card";
 import { Section, SectionHeading } from "@/components/ui/section";
 import { TestimonialCarousel } from "@/components/testimonial-carousel";
 import { formatCurrency } from "@/lib/utils";
+import { TrendingTopics } from "@/components/trending-topics";
 
 import {
   getActiveDisciplines,
@@ -515,6 +516,9 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* ===================== TRENDING TOPICS ===================== */}
+      <TrendingTopics />
 
       {/* ===================== CTA ===================== */}
       <section>

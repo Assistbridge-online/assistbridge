@@ -1,7 +1,7 @@
 import { Mail, Clock, CheckCircle2, XCircle, HelpCircle, RefreshCw, AlertCircle, Scissors, MessageCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
-export const metadata = { title: "Refund Policy" };
+export const metadata = { title: "Refund Policy", description: "AssistBridge 14-day review window, refund eligibility, and dispute resolution process." };
 
 const sections = [
   {

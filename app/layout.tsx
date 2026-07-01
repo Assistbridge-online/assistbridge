@@ -52,6 +52,7 @@ export const metadata: Metadata = {
     description: siteConfig.description,
     images: [siteConfig.ogImage],
   },
+  alternates: { canonical: siteConfig.url },
   robots: { index: true, follow: true },
   icons: {
     icon: "/assistbridge-logo.png",
