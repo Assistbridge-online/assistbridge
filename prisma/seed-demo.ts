@@ -34,6 +34,9 @@ async function main() {
   await prisma.pricingTier.deleteMany();
   await prisma.pricingConfig.deleteMany();
   await prisma.siteStat.deleteMany();
+  await prisma.serviceAcademicPrice.deleteMany();
+  await prisma.academicLevel.deleteMany();
+  await prisma.subject.deleteMany();
   await prisma.user.deleteMany();
 
   // --- Pricing config ---
