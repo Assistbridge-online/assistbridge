@@ -5,7 +5,7 @@ export const siteConfig = {
   description:
     "AssistBridge connects you with vetted experts for research, technical, and academic assistance across every discipline. From data analysis to engineering, get the help you need, on demand.",
   url: "https://assistbridge.online",
-  ogImage: "/og.png",
+  ogImage: "/assistbridge-logo.png",
   email: "info@assistbridge.online",
   ownerEmail: "patywafula2019@gmail.com",
   phone: "",
