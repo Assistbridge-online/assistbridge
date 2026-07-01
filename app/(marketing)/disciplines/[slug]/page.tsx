@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { getActiveDisciplines, getDisciplineBySlug, getSiteStats } from "@/lib/content";
 import { DisciplineIcon, disciplineSlug, splitPipes } from "@/lib/display";
 
+export const dynamic = "force-dynamic";
+
 export async function generateStaticParams() {
   const disciplines = await getActiveDisciplines();
   return disciplines.map((d) => ({ slug: disciplineSlug(d.name) }));

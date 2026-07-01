@@ -31,6 +31,8 @@ import {
 import { DisciplineIcon, ServiceIcon, disciplineSlug } from "@/lib/display";
 import { siteConfig } from "@/lib/site";
 
+export const dynamic = "force-dynamic";
+
 const statLabels: Record<string, string> = {
   disciplines: "Disciplines covered",
   experts: "Vetted experts",

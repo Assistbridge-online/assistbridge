@@ -7,6 +7,8 @@ import { PriceCalculator } from "@/components/price-calculator";
 import { getActiveAcademicLevels, getActiveFaqs, getActiveServices, getActiveSubjects } from "@/lib/content";
 import { saveCalculatorOrder } from "@/lib/actions/orders";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Pricing",
   description: "Per-page pricing by academic level. Transparent, no hidden fees.",

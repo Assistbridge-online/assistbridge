@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { getActiveFaqs } from "@/lib/content";
 import { FaqList } from "@/components/faq-list";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = { title: "FAQ", description: "Frequently asked questions about AssistBridge." };
 
 export default async function FAQPage() {

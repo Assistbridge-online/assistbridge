@@ -7,6 +7,8 @@ import { PriceCalculator } from "@/components/price-calculator";
 import { saveCalculatorOrder } from "@/lib/actions/orders";
 import { getActiveServices, getActiveAcademicLevels, getActiveSubjects } from "@/lib/content";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Price calculator",
   description: "See the exact price for your assignment before you commit. No signup required.",

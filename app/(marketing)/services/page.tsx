@@ -8,6 +8,8 @@ import { ServiceIcon } from "@/lib/display";
 import { formatCurrency } from "@/lib/utils";
 import { FaqList } from "@/components/faq-list";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = { title: "Services", description: "Browse all services offered by AssistBridge." };
 
 const categoryImages: Record<string, { img: string; alt: string }> = {

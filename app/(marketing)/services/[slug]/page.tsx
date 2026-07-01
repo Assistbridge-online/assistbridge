@@ -9,6 +9,8 @@ import { getActiveServices, getServiceBySlug } from "@/lib/content";
 import { ServiceIcon, splitPipes } from "@/lib/display";
 import { formatCurrency } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 export async function generateStaticParams() {
   const services = await getActiveServices();
   return services.map((s) => ({ slug: s.slug }));

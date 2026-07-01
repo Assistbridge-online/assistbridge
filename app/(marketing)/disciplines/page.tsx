@@ -4,6 +4,8 @@ import { ArrowRight, Search, Shield, Globe, Clock, Award, Sparkles, Plus } from 
 import { getActiveDisciplines, getActiveServices, getSiteStats } from "@/lib/content";
 import { DisciplineIcon, disciplineSlug } from "@/lib/display";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = { title: "Disciplines", description: "Every discipline covered by AssistBridge." };
 
 export default async function DisciplinesPage() {

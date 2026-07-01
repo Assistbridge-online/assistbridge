@@ -20,6 +20,8 @@ import { Button } from "@/components/ui/button";
 import { getActiveTestimonials, getSiteStats } from "@/lib/content";
 import { siteConfig } from "@/lib/site";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "About",
   description: "How AssistBridge got started, what we believe, and how we work.",

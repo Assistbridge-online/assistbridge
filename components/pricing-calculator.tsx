@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
-import { Calculator, Sparkles, Calendar, Clock } from "lucide-react";
+import { Calculator, Calendar, Clock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
@@ -178,9 +178,7 @@ export function PricingCalculator({
           <Link
             href={`/dashboard/new?service=${serviceId}&pages=${pages}&deadline=${encodeURIComponent(deadlineDate)}&time=${encodeURIComponent(deadlineTime)}`}
           >
-            <span className="inline-flex items-center gap-1.5 text-sm">
-              <Sparkles className="h-3.5 w-3.5" /> Request
-            </span>
+            <span className="text-sm">Request</span>
           </Link>
         </Button>
       </div>

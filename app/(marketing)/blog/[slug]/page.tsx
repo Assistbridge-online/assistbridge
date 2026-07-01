@@ -10,6 +10,8 @@ import { getPostBySlug, getPublishedPosts } from "@/lib/content";
 type Params = { slug: string };
 type SearchParams = Record<string, string | string[] | undefined>;
 
+export const dynamic = "force-dynamic";
+
 export async function generateStaticParams() {
   const posts = await getPublishedPosts();
   return posts.map((p) => ({ slug: p.slug }));

@@ -8,6 +8,8 @@ import { CategoryDropdown } from "@/components/blog/category-dropdown";
 import { formatDate } from "@/lib/utils";
 import { getPublishedPosts } from "@/lib/content";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "AssistBridge Blog: Insights on Research, Data, and Expert Help",
   description:
