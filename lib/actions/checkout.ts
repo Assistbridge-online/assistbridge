@@ -349,7 +349,11 @@ export async function registerAfterPayment(sessionId: string, name: string, emai
   };
 }
 
-export async function confirmVerificationCode(email: string, code: string, name: string, password: string, sessionId: string) {
+/* ─── Shared logic (used by server actions AND API routes) ─── */
+
+export async function confirmVerificationCodeAction(
+  email: string, code: string, name: string, password: string, sessionId: string
+) {
   const record = await prisma.verificationCode.findFirst({
     where: {
       email: email.toLowerCase(),
@@ -424,15 +428,22 @@ export async function confirmVerificationCode(email: string, code: string, name:
     },
   });
 
-  // Set session cookie server-side (works in server action context)
+  return { ok: true as const, orderId: order.id };
+}
+
+/* ─── Server action (with auto-login + redirect) ─── */
+
+export async function confirmVerificationCode(email: string, code: string, name: string, password: string, sessionId: string) {
+  const result = await confirmVerificationCodeAction(email, code, name, password, sessionId);
+  if (!result.ok) return result;
+
   await signIn("credentials", {
     email: email.toLowerCase(),
     password,
     redirect: false,
   });
 
-  // Redirect to dashboard (Next.js handles this client-side automatically)
-  redirect(`/dashboard/orders/${order.id}`);
+  redirect(`/dashboard/orders/${result.orderId}`);
 }
 
 export async function resendVerificationCode(email: string) {
