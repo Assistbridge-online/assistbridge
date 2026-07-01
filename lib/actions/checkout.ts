@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
-import { auth, signIn } from "@/auth";
+import { auth } from "@/auth";
 import { sendEmail } from "@/lib/email";
 import { getStripe } from "@/lib/stripe";
 import { siteConfig } from "@/lib/site";
@@ -431,19 +431,11 @@ export async function confirmVerificationCodeAction(
   return { ok: true as const, orderId: order.id };
 }
 
-/* ─── Server action (with auto-login + redirect) ─── */
+/* ─── Server action (returns result; client handles sign-in + redirect) ─── */
 
 export async function confirmVerificationCode(email: string, code: string, name: string, password: string, sessionId: string) {
   const result = await confirmVerificationCodeAction(email, code, name, password, sessionId);
-  if (!result.ok) return result;
-
-  await signIn("credentials", {
-    email: email.toLowerCase(),
-    password,
-    redirect: false,
-  });
-
-  redirect(`/dashboard/orders/${result.orderId}`);
+  return result;
 }
 
 export async function resendVerificationCode(email: string) {

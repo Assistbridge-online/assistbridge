@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
 import { Mail, Lock, User, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
+import { signIn } from "next-auth/react";
 import { registerAfterPayment, confirmVerificationCode, resendVerificationCode } from "@/lib/actions/checkout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -50,12 +51,27 @@ function CheckoutSuccessInner() {
     setLoading(true);
     setError("");
 
-    try {
-      await confirmVerificationCode(email, fullCode, name, password, sessionId);
-    } catch {
-      setError("Something went wrong. Please try again.");
+    const result = await confirmVerificationCode(email, fullCode, name, password, sessionId);
+    if (!result.ok) {
+      setError(result.error || "Something went wrong. Please try again.");
       setLoading(false);
+      return;
     }
+
+    const signInResult = await signIn("credentials", {
+      email: email.toLowerCase(),
+      password,
+      redirect: false,
+    });
+
+    if (signInResult?.error) {
+      setError("Account created but login failed. Please sign in manually.");
+      setLoading(false);
+      window.location.href = `/dashboard/orders/${result.orderId}`;
+      return;
+    }
+
+    window.location.href = `/dashboard/orders/${result.orderId}`;
   }
 
   async function handleSubmit(e: React.FormEvent) {
