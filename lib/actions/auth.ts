@@ -6,6 +6,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { sendEmail } from "@/lib/email";
 import { signIn } from "@/auth";
+import { AuthError } from "next-auth";
 import { siteConfig } from "@/lib/site";
 import {
   verificationEmailHtml,
@@ -19,11 +20,6 @@ const signUpSchema = z.object({
   email: z.string().email().max(255),
   password: z.string().min(8).max(128),
   role: z.enum(["CLIENT", "EXPERT"]),
-});
-
-const credentialsSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
 });
 
 const resetSchema = z.object({
@@ -118,31 +114,26 @@ export async function signUp(input: {
   return { ok: true, email, role };
 }
 
-export async function signInWithCredentials(input: {
-  email: string;
-  password: string;
-  callbackUrl?: string;
-}): Promise<ActionResult<{ redirectTo: string }>> {
-  const parsed = credentialsSchema.safeParse(input);
-  if (!parsed.success) {
-    return { ok: false, error: "Please provide a valid email and password." };
-  }
-
+export async function loginAction(
+  email: string,
+  password: string,
+  callbackUrl?: string
+) {
   try {
     await signIn("credentials", {
-      email: parsed.data.email.toLowerCase().trim(),
-      password: parsed.data.password,
-      redirect: false,
+      email: email.toLowerCase().trim(),
+      password,
+      redirectTo: callbackUrl || "/dashboard",
     });
-    return { ok: true, redirectTo: input.callbackUrl || "/dashboard" };
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Sign in failed";
-    if (message.toLowerCase().includes("credentials")) {
-      return { ok: false, error: "Invalid email or password." };
+  } catch (error) {
+    if (error instanceof AuthError) {
+      return { ok: false as const, error: "Invalid email or password." };
     }
-    return { ok: false, error: "Unable to sign in. Please try again." };
+    throw error;
   }
 }
+
+
 
 export async function requestPasswordReset(
   email: string
