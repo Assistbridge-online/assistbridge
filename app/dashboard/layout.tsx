@@ -16,7 +16,14 @@ const nav: NavItem[] = [
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
-  if (!session?.user) redirect("/login?callbackUrl=/dashboard");
+  if (!session?.user) {
+    console.log("[dashboard/layout] no session, redirecting to /login", {
+      hasSession: !!session,
+      sessionKeys: session ? Object.keys(session) : [],
+      userKeys: session?.user ? Object.keys(session.user) : [],
+    });
+    redirect("/login?callbackUrl=/dashboard");
+  }
   const user = {
     name: session.user.name || "User",
     email: session.user.email || "",

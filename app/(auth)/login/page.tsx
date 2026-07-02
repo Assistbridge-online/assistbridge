@@ -46,33 +46,24 @@ function LoginForm() {
   const onSubmit = (values: LoginInput) => {
     setServerError(null);
     startTransition(async () => {
-      // Use next-auth/react's client signIn so the credentials callback sets
-      // the session cookie in the browser. Server-action signIn with
-      // `redirect: false` does not propagate Set-Cookie to the client, which
-      // is why the page was refreshing back to /login.
-      const result = await signIn("credentials", {
-        email: values.email,
-        password: values.password,
-        redirect: false,
-        callbackUrl,
-      });
-
-      if (!result || result.error) {
-        // result.error values include "CredentialsSignin" (bad password) and
-        // "Configuration" (server-side config issue). Surface both so we
-        // don't silently loop.
-        console.error("[login] signIn failed:", result);
-        const msg =
-          result?.error === "Configuration"
-            ? "Login is temporarily unavailable. Please try again shortly."
-            : "Invalid email or password.";
-        setServerError(msg);
-        return;
+      // Let next-auth/react do the full redirect (default behavior). The
+      // browser navigates to the callback URL with the freshly-issued
+      // session cookie attached, and the dashboard's proxy sees a valid
+      // session. Using `redirect: false` here is what was causing the
+      // silent /login bounce on Vercel — the cookie was set on the JSON
+      // response, but a subsequent client-side window.location.href
+      // navigation across vercel.app ↔ neonauth host boundaries lost
+      // the cookie.
+      try {
+        await signIn("credentials", {
+          email: values.email,
+          password: values.password,
+          callbackUrl,
+        });
+      } catch (err) {
+        console.error("[login] signIn threw:", err);
+        setServerError("Login failed. Please try again.");
       }
-
-      // Hard navigate so the freshly-set session cookie is sent on the next
-      // request to the dashboard.
-      window.location.href = result.url || callbackUrl;
     });
   };
 
