@@ -24,7 +24,6 @@ const oauthProviders = [
 ] as const;
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
   const urlError = searchParams.get("error");
