@@ -21,7 +21,21 @@ export default async function ExpertLayout({ children }: { children: React.React
     role: "Expert",
   };
   return (
-    <DashboardShell nav={nav} user={user} accentColor="accent">
+    <DashboardShell
+      nav={nav}
+      user={user}
+      variant="client"
+      homeLabel="Expert Portal"
+      homeHref="/expert"
+      pathLabels={{
+        expert: "Expert Portal",
+        jobs: "Available Jobs",
+        orders: "My Jobs",
+        earnings: "Earnings",
+        profile: "Profile",
+        settings: "Settings",
+      }}
+    >
       {children}
     </DashboardShell>
   );

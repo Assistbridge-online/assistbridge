@@ -1,8 +1,16 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { DashboardShell, type NavItem } from "@/components/dashboard-shell";
 import {
-  LayoutDashboard, FileText, Plus, MessageSquare, CreditCard, Settings,
+  DashboardShell,
+  type NavItem,
+} from "@/components/dashboard-shell";
+import {
+  LayoutDashboard,
+  FileText,
+  Plus,
+  MessageSquare,
+  CreditCard,
+  Settings,
 } from "lucide-react";
 
 const nav: NavItem[] = [
@@ -14,13 +22,20 @@ const nav: NavItem[] = [
   { label: "Settings", href: "/dashboard/settings", icon: <Settings className="h-4 w-4" /> },
 ];
 
+const pathLabels: Record<string, string> = {
+  dashboard: "My Portal",
+  orders: "Orders",
+  new: "New Request",
+  messages: "Messages",
+  payments: "Payments",
+  settings: "Settings",
+};
+
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
   if (!session?.user) {
     console.log("[dashboard/layout] no session, redirecting to /login", {
       hasSession: !!session,
-      sessionKeys: session ? Object.keys(session) : [],
-      userKeys: session?.user ? Object.keys(session.user) : [],
     });
     redirect("/login?callbackUrl=/dashboard");
   }
@@ -30,7 +45,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
     role: "Client",
   };
   return (
-    <DashboardShell nav={nav} user={user}>
+    <DashboardShell
+      variant="client"
+      nav={nav}
+      homeLabel="My Portal"
+      homeHref="/dashboard"
+      pathLabels={pathLabels}
+      user={user}
+    >
       {children}
     </DashboardShell>
   );

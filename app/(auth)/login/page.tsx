@@ -2,8 +2,8 @@
 
 import { useState, useTransition, Suspense } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { getSession, signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -23,9 +23,20 @@ const oauthProviders = [
   { id: "github", label: "GitHub", envFlag: "NEXT_PUBLIC_GITHUB_ENABLED" },
 ] as const;
 
+// Landing routes per role. Used when the user signs in from /login without
+// an explicit ?callbackUrl= (i.e. typed the login URL directly). Each role
+// gets its own console so admins don't accidentally end up on the client
+// dashboard after a credentials login.
+function landingRouteForRole(role: string | null | undefined): string {
+  if (role === "ADMIN") return "/admin";
+  if (role === "EXPERT") return "/expert";
+  return "/dashboard";
+}
+
 function LoginForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const callbackUrl = searchParams.get("callbackUrl") || null;
   const urlError = searchParams.get("error");
 
   const [showPassword, setShowPassword] = useState(false);
@@ -46,20 +57,40 @@ function LoginForm() {
   const onSubmit = (values: LoginInput) => {
     setServerError(null);
     startTransition(async () => {
-      // Let next-auth/react do the full redirect (default behavior). The
-      // browser navigates to the callback URL with the freshly-issued
-      // session cookie attached, and the dashboard's proxy sees a valid
-      // session. Using `redirect: false` here is what was causing the
-      // silent /login bounce on Vercel — the cookie was set on the JSON
-      // response, but a subsequent client-side window.location.href
-      // navigation across vercel.app ↔ neonauth host boundaries lost
-      // the cookie.
+      // Full-redirect sign-in (next-auth/react handles the navigation).
+      // We pass `redirectTo` (the v5 name for callback URL) so an
+      // explicit ?callbackUrl wins when present; otherwise we let
+      // NextAuth redirect to "/" and immediately route to the role-
+      // appropriate console via the post-login effect below.
+      //
+      // NOTE: We deliberately do NOT pre-compute the role on the client
+      // here — we don't have the session yet. The redirect happens
+      // server-side; on the next tick we read the session and push to
+      // /admin, /expert, or /dashboard as appropriate.
       try {
-        await signIn("credentials", {
+        const res = await signIn("credentials", {
           email: values.email,
           password: values.password,
-          callbackUrl,
+          redirect: false,
         });
+        if (!res) {
+          setServerError("Login failed. Please try again.");
+          return;
+        }
+        if (!res.ok || res.error) {
+          setServerError(
+            res.error === "CredentialsSignin"
+              ? "Wrong email or password."
+              : "Sign in failed. Please try again.",
+          );
+          return;
+        }
+        // Credentials are good — pull the session to learn the role.
+        const session = await getSession();
+        const destination =
+          callbackUrl ?? landingRouteForRole(session?.user?.role);
+        router.push(destination);
+        router.refresh();
       } catch (err) {
         console.error("[login] signIn threw:", err);
         setServerError("Login failed. Please try again.");
@@ -71,7 +102,15 @@ function LoginForm() {
     setServerError(null);
     startTransition(async () => {
       try {
-        await signIn(provider, { callbackUrl });
+        // OAuth providers: let NextAuth do the full redirect. The
+        // redirect callback in auth.config.ts routes by role on
+        // return. We pass `callbackUrl` only when the user came in
+        // via an explicit ?callbackUrl — otherwise NextAuth defaults
+        // to "/" and the redirect callback picks the right console.
+        await signIn(provider, {
+          callbackUrl: callbackUrl ?? "/",
+          redirect: true,
+        });
       } catch {
         setServerError("Unable to start OAuth flow. Please try again.");
       }
