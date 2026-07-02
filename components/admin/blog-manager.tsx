@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Edit2, Trash2, Save, X } from "lucide-react";
+import Link from "next/link";
+import { Plus, Edit2, Trash2, Save, X, Share2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -86,6 +87,13 @@ export function BlogManager({ items }: { items: Post[] }) {
                 </td>
                 <td className="px-4 py-3 text-slate-700 text-xs">{p.publishedAt ? formatDate(p.publishedAt) : "–"}</td>
                 <td className="px-4 py-3 text-right">
+                  <Link
+                    href={`/admin/social/posts/new?source=BLOG_POST&sourceId=${p.id}&title=${encodeURIComponent(p.title)}&body=${encodeURIComponent(shareBodyFor(p))}&link=${encodeURIComponent(shareLinkFor(p.slug))}&imageUrl=${encodeURIComponent(p.image ?? "")}`}
+                    title="Share to social media"
+                    className="h-8 w-8 inline-flex items-center justify-center rounded-md text-emerald-600 hover:bg-emerald-50"
+                  >
+                    <Share2 className="h-4 w-4" />
+                  </Link>
                   <button onClick={() => setEditing({ ...p })} className="h-8 w-8 inline-flex items-center justify-center rounded-md text-slate-500 hover:bg-slate-100"><Edit2 className="h-4 w-4" /></button>
                   <button onClick={() => remove(p.id)} className="h-8 w-8 inline-flex items-center justify-center rounded-md text-red-500 hover:bg-red-50"><Trash2 className="h-4 w-4" /></button>
                 </td>
@@ -96,4 +104,24 @@ export function BlogManager({ items }: { items: Post[] }) {
       </Card>
     </>
   );
+}
+
+// --- Helpers used by the "Share to social" button ---
+
+/**
+ * The prefill post body for the social composer. Use the excerpt so we
+ * stay within character limits on all platforms (LinkedIn 3k, FB 63k,
+ * IG 2.2k). Operators can edit in the composer before publishing.
+ */
+function shareBodyFor(p: Post): string {
+  return `${p.excerpt}\n\n${p.title}`;
+}
+
+/**
+ * Canonical URL of the public blog post. Uses NEXT_PUBLIC_APP_URL so it
+ * works in both dev and prod without hardcoding the domain.
+ */
+function shareLinkFor(slug: string): string {
+  const base = process.env.NEXT_PUBLIC_APP_URL ?? "https://assistbridge.online";
+  return `${base.replace(/\/$/, "")}/blog/${slug}`;
 }

@@ -166,13 +166,62 @@ export async function upsertBlogPost(formData: FormData) {
     published,
     publishedAt: published ? new Date() : null,
   };
+
+  // For auto-social: capture the previous `published` value BEFORE the
+  // update so we can detect the false -> true transition. We only want
+  // to fan-out to social platforms on first publish, not every save.
+  const previous = id
+    ? await prisma.blogPost.findUnique({ where: { id }, select: { published: true, slug: true } })
+    : null;
+
+  let savedId: string;
   if (id) {
     await prisma.blogPost.update({ where: { id }, data });
+    savedId = id;
   } else {
-    await prisma.blogPost.create({ data });
+    const created = await prisma.blogPost.create({ data });
+    savedId = created.id;
   }
   revalidatePath("/admin/blog");
   revalidatePath("/blog");
+
+  // Auto-publish to connected social accounts when a blog post transitions
+  // from unpublished -> published. Opt-in via SOCIAL_AUTO_PUBLISH_BLOG=true
+  // in env. Disabled by default — operators should curate their first few
+  // cross-posts manually before turning the autopilot on.
+  if (
+    published &&
+    process.env.SOCIAL_AUTO_PUBLISH_BLOG === "true" &&
+    previous?.published !== true
+  ) {
+    try {
+      const { prisma: db } = await import("@/lib/db");
+      const accounts = await db.socialAccount.findMany({ select: { id: true } });
+      if (accounts.length > 0) {
+        const base = process.env.NEXT_PUBLIC_APP_URL ?? "https://assistbridge.online";
+        const socialPost = await db.socialPost.create({
+          data: {
+            sourceType: "BLOG_POST",
+            sourceId: savedId,
+            title,
+            body: `${data.excerpt}\n\n${title}`,
+            link: `${base.replace(/\/$/, "")}/blog/${slug}`,
+            imageUrl: data.image,
+            status: "QUEUED",
+            accounts: { connect: accounts.map((a) => ({ id: a.id })) },
+          },
+        });
+        // Fire immediately rather than waiting for the cron. Errors are
+        // logged inside publishPost via per-account attempt rows.
+        const { publishPost } = await import("@/lib/social/dispatch");
+        void publishPost(socialPost.id).catch((e) =>
+          console.error("[social] auto-publish failed", e),
+        );
+      }
+    } catch (e) {
+      console.error("[social] auto-publish setup failed", e);
+    }
+  }
 }
 
 export async function deleteBlogPost(id: string) {

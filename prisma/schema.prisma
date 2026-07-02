@@ -36,6 +36,10 @@ model User {
   webVisitorTickets SupportTicket[] @relation("SupportVisitor")
   blogPosts       BlogPost[]
   faqs            Faq[]
+
+  // Social plugin (assistbridge-social)
+  socialAccounts  SocialAccount[]
+  socialPosts     SocialPost[]
 }
 
 model Account {
@@ -619,4 +623,112 @@ model PushSubscription {
   lastUsedAt DateTime @default(now())
 
   @@index([userId])
+}
+
+// ============================================================
+// assistbridge-social plugin
+//
+// Cross-posting to Facebook Pages, Instagram Business, and LinkedIn
+// (Company page) from the admin console. One SocialPost fans out to
+// N SocialAccounts via platform adapters (lib/social/adapters/*).
+// Each fan-out is tracked as a SocialPostAttempt for retry + audit.
+//
+// Tokens are stored in plaintext for v1. In production we recommend
+// encrypting accessToken / refreshToken with a server-side KMS key
+// (e.g. AWS KMS, Vercel KMS) before persisting. Add that when the
+// plugin graduates from "admin convenience" to "user-facing feature".
+// ============================================================
+
+enum SocialPlatform {
+  FACEBOOK
+  INSTAGRAM
+  LINKEDIN
+}
+
+enum SocialPostStatus {
+  DRAFT
+  QUEUED
+  PUBLISHING
+  PUBLISHED
+  PARTIAL
+  FAILED
+  CANCELLED
+}
+
+enum SocialAttemptStatus {
+  PENDING
+  SENDING
+  SUCCESS
+  FAILED
+}
+
+model SocialAccount {
+  id             String   @id @default(cuid())
+  platform       SocialPlatform
+  // Friendly label the admin sees — "AssistBridge — Facebook Page".
+  accountLabel   String
+  // The platform's own ID for this account/page (FB page_id, IG user id,
+  // LinkedIn org URN like "urn:li:organization:12345").
+  externalId     String
+  externalName   String
+  accessToken    String
+  refreshToken   String?
+  tokenExpiresAt DateTime?
+  // Space-separated scopes the user granted during OAuth.
+  scopes         String
+  connectedById  String?
+  connectedBy    User?    @relation(fields: [connectedById], references: [id], onDelete: SetNull)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  attempts       SocialPostAttempt[]
+  posts          SocialPost[]
+
+  @@unique([platform, externalId])
+  @@index([platform])
+}
+
+model SocialPost {
+  id           String   @id @default(cuid())
+  // What generated this post: "BLOG_POST" | "TESTIMONIAL" | "ANNOUNCEMENT" | "CUSTOM".
+  sourceType   String
+  // ID of the source row (e.g. blogPost.id) when sourceType != "CUSTOM".
+  sourceId     String?
+  title        String
+  body         String
+  link         String?
+  imageUrl     String?
+  hashtags     String?
+  // null = send immediately on publish action. Future timestamp = queued.
+  scheduledAt  DateTime?
+  status       SocialPostStatus @default(DRAFT)
+  createdById  String?
+  createdBy    User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  attempts     SocialPostAttempt[]
+  accounts     SocialAccount[]
+
+  @@index([status, scheduledAt])
+  @@index([sourceType, sourceId])
+}
+
+model SocialPostAttempt {
+  id           String   @id @default(cuid())
+  postId       String
+  post         SocialPost   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  accountId    String
+  account      SocialAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  status       SocialAttemptStatus @default(PENDING)
+  // The post id the platform returned (FB post id, IG media id, LinkedIn URN).
+  externalId   String?
+  externalUrl  String?
+  errorCode    String?
+  errorMessage String?
+  attemptedAt  DateTime  @default(now())
+  finishedAt   DateTime?
+
+  @@index([postId])
+  @@index([accountId])
 }

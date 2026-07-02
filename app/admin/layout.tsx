@@ -20,6 +20,7 @@ import {
   TrendingUp,
   Wrench,
   Inbox,
+  Share2,
 } from "lucide-react";
 
 const iconCls = "h-4 w-4";
@@ -33,6 +34,7 @@ const groups: NavGroup[] = [
     items: [
       { label: "Overview", href: "/admin", icon: <LayoutDashboard className={iconCls} /> },
       { label: "Support inbox", href: "/admin/support", icon: <Inbox className={iconCls} /> },
+      { label: "Social", href: "/admin/social", icon: <Share2 className={iconCls} /> },
     ],
   },
   {
@@ -97,6 +99,9 @@ const pathLabels: Record<string, string> = {
   content: "Site content",
   settings: "Settings",
   support: "Support inbox",
+  social: "Social",
+  posts: "Posts",
+  accounts: "Accounts",
   new: "New",
   edit: "Edit",
 };
