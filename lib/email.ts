@@ -30,6 +30,15 @@ interface SendEmailParams {
   text?: string;
   from?: string;
   replyTo?: string;
+  // RFC 5322 threading headers. Set these when replying inside an
+  // existing email thread so the customer's client groups the message
+  // into the same conversation.
+  inReplyTo?: string;
+  references?: string;
+  // Optional custom Resend headers (e.g. X-Entity-Ref-ID)
+  headers?: Record<string, string>;
+  // Tags attached to the email for filtering in the Resend dashboard.
+  tags?: { name: string; value: string }[];
 }
 
 export async function sendEmail({
@@ -39,6 +48,10 @@ export async function sendEmail({
   text,
   from,
   replyTo,
+  inReplyTo,
+  references,
+  headers,
+  tags,
 }: SendEmailParams) {
   const fromAddress = from ?? defaultFrom;
   const recipients = Array.isArray(to) ? to : [to];
@@ -49,6 +62,8 @@ export async function sendEmail({
       from: fromAddress,
       subject,
       text: text ?? html,
+      inReplyTo,
+      references,
     });
     return { id: "dev-mode", success: true as const };
   }
@@ -61,7 +76,13 @@ export async function sendEmail({
       html,
       text,
       replyTo: replyTo ?? siteConfig.email,
-    });
+      headers: {
+        ...(inReplyTo ? { "In-Reply-To": inReplyTo } : {}),
+        ...(references ? { References: references } : {}),
+        ...(headers ?? {}),
+      },
+      tags,
+    } as any);
 
     if (result.error) {
       console.error("[email:error]", {

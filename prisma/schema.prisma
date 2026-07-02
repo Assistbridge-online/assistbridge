@@ -31,6 +31,7 @@ model User {
   reviewsReceived Review[]       @relation("ReviewTarget")
   attachments     Attachment[]
   disputes        Dispute[]      @relation("DisputeOpener")
+  supportTickets  SupportTicket[] @relation("SupportAssignee")
   blogPosts       BlogPost[]
   faqs            Faq[]
 }
@@ -451,4 +452,87 @@ model VerificationCode {
   createdAt DateTime @default(now())
 
   @@index([email, code])
+}
+
+// ============================================================
+// Support inbox (inbound + outbound support email)
+// ============================================================
+// One SupportTicket per customer conversation. Each new inbound email
+// from a known thread becomes a new SupportMessage on the same ticket.
+// Replies from the admin go out through Resend with In-Reply-To set
+// to the customer's most recent message Message-ID, so the customer's
+// email client threads them into the same conversation.
+
+model SupportTicket {
+  id          String   @id @default(cuid())
+  // First message's Message-ID — used to dedupe the initial inbound
+  // webhook event in case Resend retries it.
+  rootMessageId String  @unique
+  // Customer identity (denormalized; we don't require a User row
+  // because inbound email can come from anyone, including non-users).
+  fromEmail   String
+  fromName    String?
+  subject     String
+  status      String   @default("OPEN") // OPEN | PENDING | CLOSED
+  assigneeId  String?
+  assignee    User?    @relation("SupportAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  lastMessageAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  messages    SupportMessage[]
+  attachments SupportAttachment[]
+
+  @@index([status, lastMessageAt])
+  @@index([fromEmail])
+}
+
+model SupportMessage {
+  id          String   @id @default(cuid())
+  ticketId    String
+  ticket      SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  // Direction: "INBOUND" (from customer) | "OUTBOUND" (admin reply)
+  direction   String
+  // Sender: "customer" for inbound, the admin user's name/email for outbound
+  fromEmail   String
+  fromName    String?
+  // Resend email_id for the outbound message, or their email_id for inbound
+  resendId    String?  @unique
+  // RFC 5322 Message-ID header (for threading via In-Reply-To)
+  messageId   String   @unique
+  inReplyTo   String?
+  references  String?
+  // Plain-text body (we store text + html; html is generated at send time
+  // from text by lib/email-templates)
+  bodyText    String
+  bodyHtml    String
+  // For inbound, the raw raw from the Resend webhook event (debug aid)
+  raw         String?
+  // Set true on the first message of a ticket (used by the inbox list)
+  isFirst     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  attachments SupportAttachment[]
+
+  @@index([ticketId, createdAt])
+}
+
+model SupportAttachment {
+  id          String   @id @default(cuid())
+  ticketId    String
+  ticket      SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  messageId   String?
+  message     SupportMessage? @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  // Resend's attachment id; we fetch bytes on demand via the Resend
+  // SDK and re-host on our CDN. For now we store the URL + metadata
+  // and proxy downloads through /api/admin/support/attachments/[id].
+  resendAttachmentId String
+  filename    String
+  contentType String
+  size        Int
+  // Optional local URL once downloaded (e.g. S3 / Vercel Blob)
+  storedUrl   String?
+  createdAt   DateTime @default(now())
+
+  @@index([ticketId])
 }

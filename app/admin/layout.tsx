@@ -1,10 +1,11 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { DashboardShell, type NavItem } from "@/components/dashboard-shell";
-import { LayoutDashboard, Users, Award, FileText, CreditCard, AlertCircle, Settings, Database, FileQuestion, MessageSquare, BookOpen, Tag, TrendingUp, Wrench } from "lucide-react";
+import { LayoutDashboard, Users, Award, FileText, CreditCard, AlertCircle, Settings, Database, FileQuestion, MessageSquare, BookOpen, Tag, TrendingUp, Wrench, Inbox } from "lucide-react";
 
 const nav: NavItem[] = [
   { label: "Overview", href: "/admin", icon: <LayoutDashboard className="h-4 w-4" /> },
+  { label: "Support inbox", href: "/admin/support", icon: <Inbox className="h-4 w-4" /> },
   { label: "Users", href: "/admin/users", icon: <Users className="h-4 w-4" /> },
   { label: "Experts", href: "/admin/experts", icon: <Award className="h-4 w-4" /> },
   { label: "Orders", href: "/admin/orders", icon: <FileText className="h-4 w-4" /> },

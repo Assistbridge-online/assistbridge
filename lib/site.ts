@@ -7,6 +7,7 @@ export const siteConfig = {
   url: "https://assistbridge.online",
   ogImage: "/assistbridge-logo.png",
   email: "info@assistbridge.online",
+  supportEmail: "support@assistbridge.online",
   ownerEmail: "patywafula2019@gmail.com",
   phone: "",
   address: "",
