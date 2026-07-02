@@ -49,7 +49,9 @@ function LoginForm() {
       const result = await loginAction(values.email, values.password, callbackUrl);
       if (result && !result.ok) {
         setServerError(result.error);
+        return;
       }
+      window.location.href = callbackUrl;
     });
   };
 

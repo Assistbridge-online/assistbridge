@@ -6,7 +6,6 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { sendEmail } from "@/lib/email";
 import { signIn } from "@/auth";
-import { AuthError } from "next-auth";
 import { siteConfig } from "@/lib/site";
 import {
   verificationEmailHtml,
@@ -119,18 +118,16 @@ export async function loginAction(
   password: string,
   callbackUrl?: string
 ) {
-  try {
-    await signIn("credentials", {
-      email: email.toLowerCase().trim(),
-      password,
-      redirectTo: callbackUrl || "/dashboard",
-    });
-  } catch (error) {
-    if (error instanceof AuthError) {
-      return { ok: false as const, error: "Invalid email or password." };
-    }
-    throw error;
+  const url = await signIn("credentials", {
+    email: email.toLowerCase().trim(),
+    password,
+    redirect: false,
+    redirectTo: callbackUrl || "/dashboard",
+  });
+  if (url?.includes("error=")) {
+    return { ok: false as const, error: "Invalid email or password." };
   }
+  return { ok: true as const };
 }
 
 
