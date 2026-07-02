@@ -2,6 +2,7 @@
 
 import { randomBytes } from "crypto";
 import bcrypt from "bcryptjs";
+import { headers } from "next/headers";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { sendEmail } from "@/lib/email";
@@ -34,8 +35,38 @@ function generateToken(): string {
   return randomBytes(32).toString("hex");
 }
 
-function getBaseUrl(): string {
-  return process.env.NEXTAUTH_URL || process.env.AUTH_URL || "http://localhost:3000";
+/**
+ * Resolve the canonical base URL for absolute links (emails, redirects).
+ *
+ * Preference order:
+ *  1. NEXTAUTH_URL (explicit env, e.g. https://assistbridge.online on Vercel)
+ *  2. Live request host, read from `x-forwarded-host` (Vercel) then `host`
+ *  3. localhost:3000 (dev fallback)
+ *
+ * Reading from the request headers is the safety net when NEXTAUTH_URL is
+ * missing, stale, or pointed at a preview branch. We always honour the
+ * explicit env first because it's the only signal that says "this is the
+ * production canonical host" — request headers can be wrong (e.g. someone
+ * hits a preview domain that shouldn't be receiving email links).
+ */
+async function getBaseUrl(): Promise<string> {
+  const explicit = process.env.NEXTAUTH_URL;
+  if (explicit) return explicit.replace(/\/$/, "");
+
+  try {
+    const h = await headers();
+    const fwdHost = h.get("x-forwarded-host");
+    const host = h.get("host");
+    const proto =
+      h.get("x-forwarded-proto") ||
+      (host?.startsWith("localhost") ? "http" : "https");
+    const chosen = fwdHost || host;
+    if (chosen) return `${proto}://${chosen}`;
+  } catch {
+    // headers() not available (shouldn't happen in a server action, but
+    // don't blow up the email send if it does)
+  }
+  return "http://localhost:3000";
 }
 
 export async function signUp(input: {
@@ -79,7 +110,8 @@ export async function signUp(input: {
     data: { identifier: email, token, expires },
   });
 
-  const verifyUrl = `${getBaseUrl()}/api/auth/verify-email?token=${token}`;
+  const baseUrl = await getBaseUrl();
+  const verifyUrl = `${baseUrl}/api/auth/verify-email?token=${token}`;
 
   try {
     const html = verificationEmailHtml({
@@ -98,13 +130,13 @@ export async function signUp(input: {
       name: user.name || "there",
       role,
       siteName: siteConfig.name,
-      loginUrl: `${getBaseUrl()}/login`,
+      loginUrl: `${baseUrl}/login`,
     });
     await sendEmail({
       to: email,
       subject: `Welcome to ${siteConfig.name}`,
       html: welcomeHtml,
-      text: `Hi ${user.name || "there"},\n\nWelcome to ${siteConfig.name}! Your account has been created. Sign in at ${getBaseUrl()}/login`,
+      text: `Hi ${user.name || "there"},\n\nWelcome to ${siteConfig.name}! Your account has been created. Sign in at ${baseUrl}/login`,
     });
   } catch (err) {
     console.error("[signUp] Failed to send verification email:", err);
@@ -118,16 +150,41 @@ export async function loginAction(
   password: string,
   callbackUrl?: string
 ) {
-  const url = await signIn("credentials", {
-    email: email.toLowerCase().trim(),
-    password,
-    redirect: false,
-    redirectTo: callbackUrl || "/dashboard",
-  });
-  if (url?.includes("error=")) {
+  try {
+    const url = await signIn("credentials", {
+      email: email.toLowerCase().trim(),
+      password,
+      redirect: false,
+      redirectTo: callbackUrl || "/dashboard",
+    });
+    if (url?.includes("error=")) {
+      console.log("[loginAction] signIn returned error url", {
+        email: email.toLowerCase().trim(),
+        url,
+      });
+      return { ok: false as const, error: "Invalid email or password." };
+    }
+    return { ok: true as const };
+  } catch (err) {
+    // next-auth v5 throws a CredentialsSignin for bad creds and a
+    // Configuration error for server-side issues. Log the full shape so we
+    // can see in the Vercel function log exactly which one fired.
+    console.error("[loginAction] signIn threw", {
+      email: email.toLowerCase().trim(),
+      errType: (err as { type?: string })?.type,
+      errMessage: (err as { message?: string })?.message ?? String(err),
+      errName: (err as { name?: string })?.name,
+    });
+    const t = (err as { type?: string })?.type;
+    if (t === "Configuration") {
+      return {
+        ok: false as const,
+        error:
+          "Server configuration error. Please contact support if this persists.",
+      };
+    }
     return { ok: false as const, error: "Invalid email or password." };
   }
-  return { ok: true as const };
 }
 
 
@@ -154,7 +211,7 @@ export async function requestPasswordReset(
       data: { identifier: normalizedEmail, token, expires },
     });
 
-    const resetUrl = `${getBaseUrl()}/reset-password?token=${token}`;
+    const resetUrl = `${await getBaseUrl()}/reset-password?token=${token}`;
     try {
       const html = passwordResetEmailHtml({
         name: user.name || "there",

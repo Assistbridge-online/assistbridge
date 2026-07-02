@@ -21,22 +21,61 @@ const providers: Parameters<typeof NextAuth>[0]["providers"] = [
     },
     async authorize(raw) {
       const parsed = credentialsSchema.safeParse(raw);
-      if (!parsed.success) return null;
+      if (!parsed.success) {
+        console.log("[auth:credentials] schema reject", {
+          issues: parsed.error.issues.map((i) => i.path.join(".")),
+        });
+        return null;
+      }
       const { email, password } = parsed.data;
-      const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
-      if (!user || !user.hashedPassword) return null;
+      const user = await prisma.user.findUnique({
+        where: { email: email.toLowerCase() },
+      });
+      if (!user) {
+        console.log("[auth:credentials] no user", { email: email.toLowerCase() });
+        return null;
+      }
+      if (!user.hashedPassword) {
+        console.log("[auth:credentials] no hashedPassword on user", {
+          id: user.id,
+          email: user.email,
+        });
+        return null;
+      }
       const ok = await bcrypt.compare(password, user.hashedPassword);
-      if (!ok) return null;
-      return { id: user.id, email: user.email, name: user.name, image: user.image, role: user.role };
+      if (!ok) {
+        console.log("[auth:credentials] bcrypt mismatch", { id: user.id });
+        return null;
+      }
+      console.log("[auth:credentials] ok", { id: user.id, role: user.role });
+      return {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        image: user.image,
+        role: user.role,
+      };
     },
   }),
 ];
 
 if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
-  providers.push(Google({ clientId: process.env.GOOGLE_CLIENT_ID, clientSecret: process.env.GOOGLE_CLIENT_SECRET, allowDangerousEmailAccountLinking: true }));
+  providers.push(
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      allowDangerousEmailAccountLinking: true,
+    })
+  );
 }
 if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
-  providers.push(GitHub({ clientId: process.env.GITHUB_CLIENT_ID, clientSecret: process.env.GITHUB_CLIENT_SECRET, allowDangerousEmailAccountLinking: true } as any));
+  providers.push(
+    GitHub({
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      allowDangerousEmailAccountLinking: true,
+    } as any)
+  );
 }
 
 // IMPORTANT: session strategy is JWT (set in auth.config.ts), so we do NOT
