@@ -19,10 +19,31 @@
  * Hidden when the user is on /admin/* (the admin is busy doing
  * something else and shouldn't see it) and on /login (don't bug people
  * mid-auth).
+ *
+ * Audio:
+ *   - Soft "ping" on new admin messages and admin typing indicators
+ *     (gated by user-controlled mute).
+ *   - Audio is synthesised via the Web Audio API on demand — no asset
+ *     files needed, no autoplay friction (lazily created on first
+ *     user interaction with the widget).
+ *
+ * Visual:
+ *   - Bubble uses a calm primary→accent gradient with a soft glow,
+ *     chosen to blend with the marketing site (no jarring saturated
+ *     blue) rather than shout at the user.
  */
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { MessageCircle, X, Send, Paperclip, Mail } from "lucide-react";
+import {
+  MessagesSquare,
+  X,
+  Send,
+  Paperclip,
+  Mail,
+  Bell,
+  BellOff,
+  Volume2,
+} from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -49,6 +70,8 @@ type Snapshot = {
     messages: Message[];
   };
 };
+
+const SOUND_PREF_KEY = "livechat_sound_muted";
 
 function readCookie(name: string): string | null {
   if (typeof document === "undefined") return null;
@@ -81,13 +104,81 @@ function LivechatWidgetInner() {
   const [submitting, setSubmitting] = useState(false);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
-  const [typing, setTyping] = useState(false);
   const [adminOnline, setAdminOnline] = useState(false);
   const [adminTyping, setAdminTyping] = useState(false);
+  const [muted, setMuted] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem(SOUND_PREF_KEY) === "1";
+  });
+  const [unseen, setUnseen] = useState(0);
   const esRef = useRef<EventSource | null>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastTypingSentRef = useRef(0);
   const listRef = useRef<HTMLDivElement | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  // Track last-seen message id so we can detect *new* incoming messages
+  // (not the first hydration).
+  const lastSeenMessageIdRef = useRef<string | null>(null);
+  const hydratedOnceRef = useRef(false);
+  // Mirror of `open` for use inside async callbacks (SSE handler) where
+  // we need the freshest value without re-subscribing on every toggle.
+  const openRef = useRef(open);
+  openRef.current = open;
+
+  // Lazily construct the AudioContext on first user interaction —
+  // browsers refuse to start audio playback until then.
+  function ensureAudio(): AudioContext | null {
+    if (muted) return null;
+    if (typeof window === "undefined") return null;
+    if (audioCtxRef.current) return audioCtxRef.current;
+    try {
+      const Ctor: typeof AudioContext | undefined =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext?: typeof AudioContext })
+          .webkitAudioContext;
+      if (!Ctor) return null;
+      audioCtxRef.current = new Ctor();
+      return audioCtxRef.current;
+    } catch {
+      return null;
+    }
+  }
+
+  function playPing(opts?: { soft?: boolean }) {
+    const ctx = ensureAudio();
+    if (!ctx) return;
+    // Browsers suspend a freshly-created AudioContext until the next
+    // user gesture. resume() is idempotent and safe to call here.
+    if (ctx.state === "suspended") {
+      ctx.resume().catch(() => {});
+    }
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    // Two-tone ping — the second note is what makes it feel like a
+    // chat notification rather than an error beep.
+    osc.frequency.setValueAtTime(opts?.soft ? 660 : 880, now);
+    osc.frequency.exponentialRampToValueAtTime(
+      opts?.soft ? 520 : 660,
+      now + 0.18,
+    );
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.12, now + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.3);
+  }
+
+  function persistMute(next: boolean) {
+    setMuted(next);
+    try {
+      window.localStorage.setItem(SOUND_PREF_KEY, next ? "1" : "0");
+    } catch {
+      /* private mode etc. */
+    }
+  }
 
   // Boot: hydrate from /api/support/widget/ticket
   useEffect(() => {
@@ -133,7 +224,23 @@ function LivechatWidgetInner() {
         // can switch to passing the message payload through the event.
         fetch("/api/support/widget/ticket", { credentials: "include" })
           .then((r) => r.json())
-          .then((data) => setSnapshot(data));
+          .then((data) => {
+            setSnapshot(data);
+            // Detect new inbound (admin) messages and notify.
+            const msgs = data?.ticket?.messages ?? [];
+            if (msgs.length === 0) return;
+            const newest = msgs[msgs.length - 1];
+            if (newest.id === lastSeenMessageIdRef.current) return;
+            lastSeenMessageIdRef.current = newest.id;
+            if (newest.direction === "INBOUND") {
+              playPing();
+              // Bump unread badge if the panel is closed at the moment
+              // the message arrives.
+              if (!openRef.current) {
+                setUnseen((n) => n + 1);
+              }
+            }
+          });
       } catch {
         /* malformed event */
       }
@@ -144,7 +251,13 @@ function LivechatWidgetInner() {
           actorKind: "admin" | "visitor";
           isTyping: boolean;
         };
-        if (data.actorKind === "admin") setAdminTyping(data.isTyping);
+        if (data.actorKind === "admin") {
+          setAdminTyping(data.isTyping);
+          // Subtle tick when admin starts typing — only fires once
+          // per typing session because we already debounce on the
+          // server side. Cheap and pleasant.
+          if (data.isTyping) playPing({ soft: true });
+        }
       } catch {
         /* */
       }
@@ -168,7 +281,28 @@ function LivechatWidgetInner() {
       es.close();
       esRef.current = null;
     };
+  // playPing is intentionally read inside the SSE handler via closure
+  // (it's stable — created once per render). We don't want this effect
+  // to re-subscribe every time something causes playPing to be a new
+  // reference.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, snapshot?.found, snapshot?.ticket?.id]);
+
+  // First-time snapshot hydration — record the newest message id so
+  // the SSE handler doesn't fire notifications for messages that
+  // already existed when the visitor opened the widget.
+  useEffect(() => {
+    if (!snapshot?.ticket) return;
+    const msgs = snapshot.ticket.messages ?? [];
+    if (msgs.length === 0) {
+      lastSeenMessageIdRef.current = null;
+      hydratedOnceRef.current = true;
+      return;
+    }
+    const newest = msgs[msgs.length - 1];
+    lastSeenMessageIdRef.current = newest.id;
+    hydratedOnceRef.current = true;
+  }, [snapshot?.ticket]);
 
   // Scroll to bottom on new messages.
   useEffect(() => {
@@ -215,6 +349,8 @@ function LivechatWidgetInner() {
     }
     setSubmitting(true);
     try {
+      // First user interaction is the unlock for Web Audio.
+      ensureAudio();
       const r = await fetch("/api/support/widget/start", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -242,6 +378,7 @@ function LivechatWidgetInner() {
     if (!body) return;
     setSending(true);
     try {
+      ensureAudio();
       const r = await fetch(`/api/support/conversations/${snapshot.ticket.id}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -304,43 +441,92 @@ function LivechatWidgetInner() {
 
   return (
     <>
-      {/* Bubble */}
+      {/* Bubble — calm gradient + soft ring, blends with the marketing site. */}
       {!open && (
         <button
           type="button"
-          onClick={() => setOpen(true)}
+          onClick={() => {
+            ensureAudio();
+            setOpen(true);
+            setUnseen(0);
+          }}
           aria-label="Open chat"
-          className="fixed bottom-5 right-5 z-50 h-14 w-14 rounded-full bg-primary-700 text-white shadow-xl hover:bg-primary-800 transition flex items-center justify-center"
+          className={cn(
+            "fixed bottom-5 right-5 z-50 h-14 w-14 rounded-full text-white shadow-xl transition",
+            "flex items-center justify-center",
+            // Soft white→indigo→teal gradient that picks up the brand
+            // palette without screaming at visitors.
+            "bg-gradient-to-br from-primary-600 via-primary-700 to-accent-600",
+            "ring-1 ring-white/30 ring-offset-2 ring-offset-white/0",
+            "hover:from-primary-500 hover:via-primary-600 hover:to-accent-500",
+            "hover:shadow-2xl",
+            // Gentle breathing animation when there are unread messages.
+            unseen > 0 && "animate-[pulse_2.4s_ease-in-out_infinite]",
+          )}
+          style={{
+            boxShadow:
+              "0 12px 28px -8px rgba(29, 78, 216, 0.45), 0 4px 12px -4px rgba(8, 145, 178, 0.35)",
+          }}
         >
-          <MessageCircle className="h-6 w-6" />
+          <MessagesSquare className="h-6 w-6" strokeWidth={2.2} />
+          {unseen > 0 && (
+            <span className="absolute -top-1 -right-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white ring-2 ring-white">
+              {unseen > 9 ? "9+" : unseen}
+            </span>
+          )}
         </button>
       )}
 
       {/* Panel */}
       {open && (
-        <div className="fixed bottom-5 right-5 z-50 w-[min(380px,calc(100vw-2rem))] h-[min(560px,calc(100vh-2rem))] rounded-2xl border border-slate-200 bg-white shadow-2xl flex flex-col overflow-hidden">
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 bg-primary-700 text-white">
+        <div
+          className={cn(
+            "fixed bottom-5 right-5 z-50 flex flex-col overflow-hidden",
+            "w-[min(380px,calc(100vw-2rem))] h-[min(560px,calc(100vh-2rem))]",
+            "rounded-2xl border border-slate-200/80 bg-white shadow-2xl",
+          )}
+        >
+          {/* Header — gradient matches the bubble so the panel feels
+              like an extension of the same affordance. */}
+          <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-br from-primary-700 via-primary-700 to-accent-700 text-white">
             <div>
-              <div className="font-semibold text-sm">AssistBridge Support</div>
-              <div className="text-xs text-primary-100 flex items-center gap-1.5">
+              <div className="font-semibold text-sm flex items-center gap-2">
+                <MessagesSquare className="h-4 w-4 opacity-90" strokeWidth={2.2} />
+                AssistBridge Support
+              </div>
+              <div className="text-xs text-primary-100/90 flex items-center gap-1.5 mt-0.5">
                 <span
                   className={cn(
                     "inline-block h-1.5 w-1.5 rounded-full",
                     adminOnline ? "bg-emerald-300" : "bg-slate-300",
                   )}
                 />
-                {adminOnline ? "Support online" : "We'll reply by email"}
+                {adminOnline ? "Support online" : "We\u2019ll reply by email"}
               </div>
             </div>
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              className="rounded-md p-1 hover:bg-primary-800"
-              aria-label="Close chat"
-            >
-              <X className="h-4 w-4" />
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => persistMute(!muted)}
+                title={muted ? "Unmute sounds" : "Mute sounds"}
+                aria-label={muted ? "Unmute sounds" : "Mute sounds"}
+                className="rounded-md p-1 hover:bg-white/10"
+              >
+                {muted ? (
+                  <BellOff className="h-4 w-4" />
+                ) : (
+                  <Bell className="h-4 w-4" />
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="rounded-md p-1 hover:bg-white/10"
+                aria-label="Close chat"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
           </div>
 
           {!snapshot ? (
@@ -351,7 +537,7 @@ function LivechatWidgetInner() {
             // INTAKE FORM
             <form onSubmit={submitIntake} className="flex-1 flex flex-col p-4 gap-3 overflow-y-auto">
               <p className="text-sm text-slate-700 leading-relaxed">
-                Hi there. Leave your name and email and we'll get you a real
+                Hi there. Leave your name and email and we&apos;ll get you a real
                 human reply — usually in a few minutes during business hours.
               </p>
               <label className="text-xs font-medium text-slate-600">
@@ -390,12 +576,12 @@ function LivechatWidgetInner() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="mt-2 h-10 rounded-lg bg-primary-700 text-white text-sm font-semibold hover:bg-primary-800 transition disabled:opacity-50"
+                className="mt-2 h-10 rounded-lg bg-gradient-to-r from-primary-700 to-accent-700 text-white text-sm font-semibold hover:from-primary-800 hover:to-accent-800 transition disabled:opacity-50"
               >
                 {submitting ? "Starting chat…" : "Start chat"}
               </button>
               <p className="text-[11px] text-slate-500 leading-relaxed">
-                We'll email you a copy of this conversation. By starting a
+                We\u2019ll email you a copy of this conversation. By starting a
                 chat you agree to our terms.
               </p>
             </form>
@@ -410,10 +596,10 @@ function LivechatWidgetInner() {
                   >
                     <div
                       className={cn(
-                        "max-w-[80%] rounded-2xl px-3 py-2 text-sm",
+                        "max-w-[80%] rounded-2xl px-3 py-2 text-sm shadow-sm",
                         m.direction === "INBOUND"
                           ? "bg-white border border-slate-200"
-                          : "bg-primary-700 text-white",
+                          : "bg-gradient-to-br from-primary-600 to-primary-700 text-white",
                       )}
                     >
                       <div
@@ -422,18 +608,35 @@ function LivechatWidgetInner() {
                       />
                       <div
                         className={cn(
-                          "mt-1 text-[10px]",
-                          m.direction === "INBOUND" ? "text-slate-400" : "text-primary-100",
+                          "mt-1 text-[10px] flex items-center gap-1",
+                          m.direction === "INBOUND" ? "text-slate-400" : "text-primary-100/90",
                         )}
                       >
-                        {m.direction === "INBOUND" ? (m.fromName ?? "You") : "AssistBridge"}
+                        <span>{m.direction === "INBOUND" ? (m.fromName ?? "You") : "AssistBridge"}</span>
+                        {m.direction === "OUTBOUND" && !muted && (
+                          <Volume2 className="h-3 w-3 opacity-60" aria-hidden="true" />
+                        )}
                       </div>
                     </div>
                   </div>
                 ))}
                 {adminTyping && (
                   <div className="flex justify-start">
-                    <div className="bg-white border border-slate-200 rounded-2xl px-3 py-2 text-xs text-slate-500 italic">
+                    <div className="bg-white border border-slate-200 rounded-2xl px-3 py-2 text-xs text-slate-500 italic inline-flex items-center gap-1.5">
+                      <span className="inline-flex gap-0.5">
+                        <span
+                          className="h-1.5 w-1.5 rounded-full bg-slate-400 animate-bounce"
+                          style={{ animationDelay: "0ms" }}
+                        />
+                        <span
+                          className="h-1.5 w-1.5 rounded-full bg-slate-400 animate-bounce"
+                          style={{ animationDelay: "150ms" }}
+                        />
+                        <span
+                          className="h-1.5 w-1.5 rounded-full bg-slate-400 animate-bounce"
+                          style={{ animationDelay: "300ms" }}
+                        />
+                      </span>
                       Support is typing…
                     </div>
                   </div>
@@ -471,7 +674,7 @@ function LivechatWidgetInner() {
                   <button
                     type="submit"
                     disabled={sending || !draft.trim()}
-                    className="rounded-lg bg-primary-700 text-white p-2 hover:bg-primary-800 transition disabled:opacity-40"
+                    className="rounded-lg bg-gradient-to-br from-primary-600 to-accent-600 text-white p-2 hover:from-primary-700 hover:to-accent-700 transition disabled:opacity-40"
                     aria-label="Send"
                   >
                     <Send className="h-4 w-4" />
