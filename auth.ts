@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
 import bcrypt from "bcryptjs";
+import crypto from "node:crypto";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { authConfig } from "@/auth.config";
@@ -74,7 +75,11 @@ if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
       clientId: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
       allowDangerousEmailAccountLinking: true,
-    } as any)
+      // `allowDangerousEmailAccountLinking` isn't on the next-auth v5
+      // beta GitHub provider's typings, but it IS a documented top-
+      // level provider option in @auth/core. Cast through `unknown`
+      // to keep the strict-no-explicit-any rule happy.
+    } as unknown as Parameters<typeof GitHub>[0])
   );
 }
 
@@ -85,7 +90,34 @@ if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
 // adapter silently returns no session and the layout redirects to /login
 // even though the JWT is valid. JWT-only is the right model for credentials
 // + OAuth-with-allowDangerousEmailAccountLinking.
+//
+// `secret` is REQUIRED for the JWT session strategy in next-auth v5 —
+// @auth/core throws MissingSecret("Please define a `secret`") if neither
+// AUTH_SECRET nor NEXTAUTH_SECRET is set in the environment. The local
+// .env / .env.production.template historically used NEXTAUTH_SECRET (the
+// v4 name); v5 prefers AUTH_SECRET. Accept both so existing deployments
+// keep working without an env var rename.
+const authSecret =
+  process.env.AUTH_SECRET ||
+  process.env.NEXTAUTH_SECRET ||
+  (process.env.NODE_ENV !== "production"
+    ? // Dev fallback — generated random secret keeps dev sessions from
+      // bleeding across restarts. NOT safe for production. Real prod
+      // deployments MUST set AUTH_SECRET (or NEXTAUTH_SECRET) in env.
+      crypto.randomBytes(32).toString("hex")
+    : undefined);
+
+if (!authSecret && process.env.NODE_ENV === "production") {
+  // Fail loud at module load in prod rather than mid-request. Logs the
+  // exact variable name operators should set so the fix is obvious.
+  console.error(
+    "[auth] Missing JWT signing secret. Set AUTH_SECRET (preferred in " +
+      "next-auth v5) or NEXTAUTH_SECRET (legacy v4) in your environment.",
+  );
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
+  secret: authSecret,
   providers,
 });
