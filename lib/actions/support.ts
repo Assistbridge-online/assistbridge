@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import { sendEmail } from "@/lib/email";
 import { siteConfig } from "@/lib/site";
+import { publish } from "@/lib/support/stream";
 
 async function requireAdmin() {
   const session = await auth();
@@ -49,72 +50,102 @@ export async function replyToTicket({
   });
   if (!ticket) throw new Error("Ticket not found.");
 
-  const lastInbound = [...ticket.messages]
-    .reverse()
-    .find((m) => m.direction === "INBOUND" && m.messageId);
-  if (!lastInbound) {
-    throw new Error(
-      "No inbound message on this ticket — cannot compute threading headers.",
-    );
-  }
+  // Web-channel tickets: no email to send to. We still create the
+  // OUTBOUND SupportMessage row, then publish the SSE event so the
+  // visitor sees the reply live in their widget. If the visitor
+  // supplied an email (visitorEmail), we ALSO forward the reply to
+  // that address so they have a copy out-of-band — that's what makes
+  // "replied via web → email arrives" feel real.
+  const isWeb = ticket.channel === "web";
 
-  // Build a References chain: every Message-ID we've seen on this
-  // ticket, in chronological order, with the most recent inbound last.
-  // RFC 5322 says References should be a space-separated list of
-  // Message-IDs in the order they appeared in the conversation.
   const referencesChain = ticket.messages
     .map((m) => m.messageId)
     .filter(Boolean)
     .join(" ");
 
-  // Re: subject — preserve customer's original if we already prefixed,
-  // otherwise add Re:. Gmail-style clients strip the prefix and add
-  // their own anyway; we just keep it stable for the row's history.
-  const subject =
-    ticket.subject.toLowerCase().startsWith("re:")
+  const subject = isWeb
+    ? ticket.subject
+    : ticket.subject.toLowerCase().startsWith("re:")
       ? ticket.subject
       : `Re: ${ticket.subject}`;
 
   const html = renderReplyHtml({ body });
   const text = body.trim();
 
-  // Generate a Message-ID for the outbound message ourselves so we can
-  // store it on the row before Resend's API call returns. Resend will
-  // preserve whatever we set in the `headers` map under Message-ID.
   const outboundMessageId = `<${crypto.randomUUID()}@${new URL(siteConfig.url).host}>`;
 
-  const send = await sendEmail({
-    from: `AssistBridge Support <${siteConfig.supportEmail}>`,
-    to: ticket.fromEmail,
-    subject,
-    html,
-    text,
-    replyTo: siteConfig.supportEmail,
-    inReplyTo: lastInbound.messageId,
-    references: `${referencesChain} ${outboundMessageId}`.trim(),
-    headers: { "Message-ID": outboundMessageId },
-    tags: [
-      { name: "ticket_id", value: ticket.id },
-      { name: "direction", value: "outbound" },
-    ],
-  });
-
-  if (!send.success) {
-    throw new Error(
-      `Failed to send reply: ${(send as any).error?.message ?? "unknown error"}`,
-    );
+  let send: { id: string | null; success: true } | { success: false; error: unknown } | null = null;
+  if (!isWeb) {
+    // Email-channel: we need a real lastInbound to thread against.
+    const lastInbound = [...ticket.messages]
+      .reverse()
+      .find((m) => m.direction === "INBOUND" && m.messageId);
+    if (!lastInbound) {
+      throw new Error(
+        "No inbound message on this ticket — cannot compute threading headers.",
+      );
+    }
+    const r = await sendEmail({
+      from: `AssistBridge Support <${siteConfig.supportEmail}>`,
+      to: ticket.fromEmail,
+      subject,
+      html,
+      text,
+      replyTo: siteConfig.supportEmail,
+      inReplyTo: lastInbound.messageId,
+      references: `${referencesChain} ${outboundMessageId}`.trim(),
+      headers: { "Message-ID": outboundMessageId },
+      tags: [
+        { name: "ticket_id", value: ticket.id },
+        { name: "direction", value: "outbound" },
+      ],
+    });
+    if (!r.success) {
+      throw new Error(
+        `Failed to send reply: ${(r as any).error?.message ?? "unknown error"}`,
+      );
+    }
+    send = { id: r.id ?? null, success: true };
+  } else if (ticket.visitorEmail) {
+    // Web-channel with visitor email on file — forward a copy. We
+    // intentionally do NOT thread it via In-Reply-To because the
+    // visitor's first inbound was via the widget (no real RFC 5322
+    // Message-ID that their email client would recognize).
+    const r = await sendEmail({
+      from: `AssistBridge Support <${siteConfig.supportEmail}>`,
+      to: ticket.visitorEmail,
+      subject,
+      html,
+      text,
+      replyTo: siteConfig.supportEmail,
+      headers: { "Message-ID": outboundMessageId },
+      tags: [
+        { name: "ticket_id", value: ticket.id },
+        { name: "channel", value: "web-outbound-copy" },
+      ],
+    });
+    send = r.success ? { id: r.id ?? null, success: true } : { success: false, error: (r as any).error };
+    // Email copy is best-effort; we don't fail the admin reply if the
+    // copy send itself fails. We surface a console warning instead.
+    if (!r.success) {
+      console.warn("[support:reply:web-email-copy-failed]", {
+        ticketId: ticket.id,
+        error: (r as any).error,
+      });
+    }
   }
 
-  await prisma.supportMessage.create({
+  const savedMessage = await prisma.supportMessage.create({
     data: {
       ticketId: ticket.id,
       direction: "OUTBOUND",
+      channel: isWeb ? "web" : "email",
       fromEmail: admin.email,
       fromName: admin.name,
-      resendId: send.id ?? null,
+      resendId: send && send.success ? send.id ?? null : null,
       messageId: outboundMessageId,
-      inReplyTo: lastInbound.messageId,
-      references: referencesChain,
+      inReplyTo: null,
+      references: referencesChain || null,
       bodyText: text,
       bodyHtml: html,
       isFirst: false,
@@ -127,6 +158,14 @@ export async function replyToTicket({
       lastMessageAt: new Date(),
       status: ticket.status === "CLOSED" ? "OPEN" : ticket.status,
     },
+  });
+
+  // Push realtime: visitor widget sees the admin reply immediately.
+  publish({
+    type: "new_message",
+    ticketId: ticket.id,
+    messageId: savedMessage.id,
+    at: savedMessage.createdAt.toISOString(),
   });
 
   revalidatePath("/admin/support");

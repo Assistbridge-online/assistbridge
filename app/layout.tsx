@@ -7,6 +7,7 @@ import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/next";
 import { CookieConsent } from "@/components/cookie-consent";
 import { NavigationProgress } from "@/components/navigation-progress";
+import { LivechatWidget } from "@/components/livechat-widget";
 import { siteConfig } from "@/lib/site";
 
 const inter = Inter({
@@ -100,6 +101,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <Toaster position="top-right" richColors closeButton />
         <CookieConsent />
+        <LivechatWidget />
         <Analytics />
       </body>
     </html>

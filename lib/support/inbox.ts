@@ -174,6 +174,7 @@ export async function processInboundEmail(
     data: {
       ticketId,
       direction: "INBOUND",
+      channel: "email",
       fromEmail,
       fromName,
       resendId: parsed.resendEmailId,

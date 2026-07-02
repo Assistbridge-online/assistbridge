@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { StatusBadge } from "@/components/dashboard-widgets";
 import { cn, formatDate } from "@/lib/utils";
-import { Search } from "lucide-react";
+import { Search, Mail, Globe } from "lucide-react";
 
 interface TicketSummary {
   id: string;
@@ -13,6 +13,7 @@ interface TicketSummary {
   fromName: string | null;
   subject: string;
   status: string;
+  channel: string;
   lastMessageAt: string;
   messageCount: number;
   lastDirection: string;
@@ -28,11 +29,13 @@ const STATUS_FILTERS = [
 
 export function SupportInboxClient({ tickets }: { tickets: TicketSummary[] }) {
   const [filter, setFilter] = useState<string>("ALL");
+  const [channelFilter, setChannelFilter] = useState<string>("ALL");
   const [q, setQ] = useState("");
 
   const filtered = useMemo(() => {
     let arr = tickets;
     if (filter !== "ALL") arr = arr.filter((t) => t.status === filter);
+    if (channelFilter !== "ALL") arr = arr.filter((t) => t.channel === channelFilter);
     if (q.trim()) {
       const needle = q.trim().toLowerCase();
       arr = arr.filter(
@@ -44,7 +47,7 @@ export function SupportInboxClient({ tickets }: { tickets: TicketSummary[] }) {
       );
     }
     return arr;
-  }, [tickets, filter, q]);
+  }, [tickets, filter, channelFilter, q]);
 
   return (
     <div>
@@ -61,6 +64,28 @@ export function SupportInboxClient({ tickets }: { tickets: TicketSummary[] }) {
                   : "text-slate-600 hover:text-slate-900",
               )}
             >
+              {f.label}
+            </button>
+          ))}
+        </div>
+        <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5">
+          {[
+            { id: "ALL", label: "All channels" },
+            { id: "email", label: "Email" },
+            { id: "web", label: "Web" },
+          ].map((f) => (
+            <button
+              key={f.id}
+              onClick={() => setChannelFilter(f.id)}
+              className={cn(
+                "px-3 py-1.5 text-xs font-medium rounded-md transition inline-flex items-center gap-1",
+                channelFilter === f.id
+                  ? "bg-slate-900 text-white"
+                  : "text-slate-600 hover:text-slate-900",
+              )}
+            >
+              {f.id === "email" && <Mail className="h-3 w-3" />}
+              {f.id === "web" && <Globe className="h-3 w-3" />}
               {f.label}
             </button>
           ))}
@@ -92,6 +117,7 @@ export function SupportInboxClient({ tickets }: { tickets: TicketSummary[] }) {
                         {t.subject}
                       </span>
                       <StatusBadge status={t.status} />
+                      <ChannelChip channel={t.channel} />
                       {t.messageCount > 1 && (
                         <span className="text-xs text-slate-500">
                           {t.messageCount} msgs
@@ -130,5 +156,22 @@ export function SupportInboxClient({ tickets }: { tickets: TicketSummary[] }) {
         </div>
       )}
     </div>
+  );
+}
+
+function ChannelChip({ channel }: { channel: string }) {
+  if (channel === "web") {
+    return (
+      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-primary-50 text-primary-700 text-[10px] font-semibold uppercase tracking-wide">
+        <Globe className="h-3 w-3" />
+        Web
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[10px] font-semibold uppercase tracking-wide">
+      <Mail className="h-3 w-3" />
+      Email
+    </span>
   );
 }

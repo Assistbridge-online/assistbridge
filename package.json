@@ -32,6 +32,7 @@
     "@radix-ui/react-tooltip": "^1.2.10",
     "@stripe/stripe-js": "^9.8.0",
     "@vercel/analytics": "^2.0.1",
+    "@vercel/blob": "^2.5.0",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -47,6 +48,7 @@
     "stripe": "^22.3.0",
     "svix": "^1.96.1",
     "tailwind-merge": "^3.6.0",
+    "web-push": "^3.6.7",
     "zod": "^4.4.3"
   },
   "devDependencies": {

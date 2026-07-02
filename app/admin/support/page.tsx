@@ -34,6 +34,7 @@ export default async function SupportInboxPage() {
       fromName: t.fromName,
       subject: t.subject,
       status: t.status,
+      channel: t.channel,
       lastMessageAt: t.lastMessageAt.toISOString(),
       messageCount: t._count.messages,
       lastDirection: last?.direction ?? "INBOUND",

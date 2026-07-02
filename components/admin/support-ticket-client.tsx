@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/dashboard-widgets";
@@ -24,6 +24,7 @@ import { toast } from "sonner";
 interface Message {
   id: string;
   direction: string;
+  channel: string;
   fromEmail: string;
   fromName: string | null;
   bodyText: string;
@@ -39,14 +40,18 @@ interface Attachment {
   contentType: string;
   size: number;
   messageId: string | null;
+  storedUrl: string | null;
 }
 
 interface Ticket {
   id: string;
   subject: string;
   status: string;
+  channel: string;
   fromEmail: string;
   fromName: string | null;
+  visitorName: string | null;
+  visitorEmail: string | null;
   createdAt: string;
   lastMessageAt: string;
   assignee: { id: string; name: string; email: string } | null;
@@ -67,16 +72,113 @@ export function SupportTicketClient({ ticket: initial }: { ticket: Ticket }) {
   const [statusPending, startStatusTransition] = useTransition();
   const [showStatus, setShowStatus] = useState(false);
   const [showClaim, setShowClaim] = useState(false);
+  const [visitorOnline, setVisitorOnline] = useState(false);
+  const [visitorTyping, setVisitorTyping] = useState(false);
+  const draftRef = useRef(draft);
+  draftRef.current = draft;
+  const lastTypingSentRef = useRef(0);
+  const listRef = useRef<HTMLDivElement | null>(null);
+
+  // Subscribe to SSE so new visitor messages + typing flow in live.
+  useEffect(() => {
+    const url = `/api/support/stream/${ticket.id}`;
+    const es = new EventSource(url);
+
+    es.addEventListener("new_message", () => {
+      // Easiest reliable approach without passing message bodies
+      // through SSE: re-fetch the ticket via a server-action style
+      // refresh. We do this by reloading the thread from the server
+      // using a tiny API route.
+      fetch(`/api/admin/support/ticket/${ticket.id}`, { credentials: "include" })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((data) => {
+          if (!data) return;
+          setTicket(data);
+          setVisitorTyping(false);
+        });
+    });
+    es.addEventListener("typing", (e) => {
+      try {
+        const data = JSON.parse((e as MessageEvent).data) as {
+          actorKind: "admin" | "visitor";
+          isTyping: boolean;
+        };
+        if (data.actorKind === "visitor") setVisitorTyping(data.isTyping);
+      } catch {
+        /* */
+      }
+    });
+    es.addEventListener("presence", (e) => {
+      try {
+        const data = JSON.parse((e as MessageEvent).data) as {
+          actorKind: "admin" | "visitor";
+          online: boolean;
+        };
+        if (data.actorKind === "visitor") setVisitorOnline(data.online);
+      } catch {
+        /* */
+      }
+    });
+    es.addEventListener("status", (e) => {
+      try {
+        const data = JSON.parse((e as MessageEvent).data) as { status: string };
+        setTicket((t) => ({ ...t, status: data.status }));
+      } catch {
+        /* */
+      }
+    });
+
+    return () => es.close();
+  }, [ticket.id]);
+
+  // Scroll to bottom on new messages.
+  useEffect(() => {
+    if (!listRef.current) return;
+    listRef.current.scrollTop = listRef.current.scrollHeight;
+  }, [ticket.messages.length]);
+
+  // Admin-side typing: emit on non-empty draft, debounced 1.5 s.
+  useEffect(() => {
+    if (!draft.trim()) {
+      fetch(`/api/support/conversations/${ticket.id}/typing`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ isTyping: false }),
+      }).catch(() => {});
+      return;
+    }
+    const now = Date.now();
+    if (now - lastTypingSentRef.current > 1500) {
+      lastTypingSentRef.current = now;
+      fetch(`/api/support/conversations/${ticket.id}/typing`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ isTyping: true }),
+      }).catch(() => {});
+    }
+    const t = setTimeout(() => {
+      fetch(`/api/support/conversations/${ticket.id}/typing`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ isTyping: false }),
+      }).catch(() => {});
+    }, 2500);
+    return () => clearTimeout(t);
+  }, [draft, ticket.id]);
 
   function send() {
     if (!draft.trim()) return;
     startTransition(async () => {
       try {
         await replyToTicket({ ticketId: ticket.id, body: draft });
-        // Optimistic append — the server action revalidates the page so
-        // we'll re-render with the persisted state.
         setDraft("");
         toast.success("Reply sent");
+        // Refresh thread immediately for snappier feedback.
+        const r = await fetch(`/api/admin/support/ticket/${ticket.id}`, { credentials: "include" });
+        if (r.ok) setTicket(await r.json());
       } catch (err) {
         toast.error((err as Error).message);
       }
@@ -160,8 +262,20 @@ export function SupportTicketClient({ ticket: initial }: { ticket: Ticket }) {
           )}
         </div>
 
+        {ticket.channel === "web" && (
+          <div className="flex items-center gap-1.5 text-xs text-slate-500">
+            <span
+              className={cn(
+                "inline-block h-1.5 w-1.5 rounded-full",
+                visitorOnline ? "bg-emerald-500" : "bg-slate-300",
+              )}
+            />
+            {visitorOnline ? "Visitor online" : "Visitor offline"}
+          </div>
+        )}
+
         <div className="ml-auto flex items-center gap-2 text-xs text-slate-500">
-          {ticket.assignee ? (
+          {ticket.assignee && ticket.assignee.id !== "me" ? (
             <>
               <UserCheck className="h-3.5 w-3.5 text-emerald-600" />
               <span>Assigned to {ticket.assignee.name}</span>
@@ -175,6 +289,19 @@ export function SupportTicketClient({ ticket: initial }: { ticket: Ticket }) {
                 <UserMinus className="h-3 w-3" /> Unassign
               </Button>
             </>
+          ) : ticket.assignee?.id === "me" ? (
+            <span className="inline-flex items-center gap-1 text-emerald-700 text-xs">
+              <UserCheck className="h-3.5 w-3.5" /> Claimed by you
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={unassign}
+                loading={statusPending}
+                className="!h-7 !px-2 !text-xs ml-2"
+              >
+                Release
+              </Button>
+            </span>
           ) : (
             <Button
               variant="outline"
@@ -189,10 +316,22 @@ export function SupportTicketClient({ ticket: initial }: { ticket: Ticket }) {
       </Card>
 
       {/* Thread */}
-      <div className="space-y-3">
+      <div ref={listRef} className="space-y-3">
         {ticket.messages.map((m) => (
           <MessageBubble key={m.id} message={m} ticket={ticket} />
         ))}
+        {visitorTyping && (
+          <div className="flex justify-start">
+            <Card className="px-3 py-2 text-xs text-slate-500 italic inline-flex items-center gap-1.5">
+              <span className="inline-flex gap-0.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+                <span className="h-1.5 w-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+                <span className="h-1.5 w-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+              </span>
+              Customer is typing…
+            </Card>
+          </div>
+        )}
       </div>
 
       {/* Composer */}
@@ -202,7 +341,11 @@ export function SupportTicketClient({ ticket: initial }: { ticket: Ticket }) {
             Reply
           </span>
           <span className="text-xs text-slate-400">
-            Reply will thread into {ticket.fromEmail}'s inbox
+            {ticket.channel === "web"
+              ? `Reply will be delivered live to ${
+                  ticket.visitorName ?? ticket.visitorEmail ?? "the visitor"
+                } and emailed to ${ticket.visitorEmail ?? "no email"}`
+              : `Reply will thread into ${ticket.fromEmail}'s inbox`}
           </span>
         </div>
         <textarea
@@ -264,6 +407,7 @@ function MessageBubble({
           {inbound && m.fromName && (
             <span className="text-slate-400">&lt;{m.fromEmail}&gt;</span>
           )}
+          <span className="text-slate-400">via {m.channel}</span>
           <span className="ml-auto">{formatDate(m.createdAt)}</span>
         </div>
         <div
@@ -275,7 +419,7 @@ function MessageBubble({
             {atts.map((a) => (
               <a
                 key={a.id}
-                href={`/api/admin/support/attachments/${a.id}`}
+                href={a.storedUrl ?? `/api/admin/support/attachments/${a.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-xs text-slate-700 hover:text-primary-700"

@@ -14,7 +14,7 @@ model User {
   email           String    @unique
   emailVerified   DateTime?
   name            String?
-  image           String?
+  image            String?
   hashedPassword  String?
   role            String    @default("CLIENT")
   createdAt       DateTime  @default(now())
@@ -32,6 +32,8 @@ model User {
   attachments     Attachment[]
   disputes        Dispute[]      @relation("DisputeOpener")
   supportTickets  SupportTicket[] @relation("SupportAssignee")
+  // Web channel visitors who are logged in — their tickets surface in /dashboard
+  webVisitorTickets SupportTicket[] @relation("SupportVisitor")
   blogPosts       BlogPost[]
   faqs            Faq[]
 }
@@ -466,13 +468,31 @@ model VerificationCode {
 model SupportTicket {
   id          String   @id @default(cuid())
   // First message's Message-ID — used to dedupe the initial inbound
-  // webhook event in case Resend retries it.
+  // webhook event in case Resend retries it. For web-channel tickets
+  // (no real Message-ID), this is set to "<web-{cuid}@assistbridge.online>"
+  // at create time and remains a stable dedupe key for that ticket.
   rootMessageId String  @unique
   // Customer identity (denormalized; we don't require a User row
   // because inbound email can come from anyone, including non-users).
   fromEmail   String
   fromName    String?
   subject     String
+  // Channel the conversation reached us on. Default 'email' preserves
+  // existing rows (no backfill migration). New web-channel rows have
+  // channel = 'web'.
+  channel     String   @default("email") // email | web
+  // Web-channel visitor identity. Null for email tickets. visitorId
+  // is a UUID we mint and stash in the visitor's first-party cookie so
+  // they can resume the same conversation across reloads/devices.
+  // visitorEmail / visitorName are required at widget start (see
+  // visitor-pii policy) so an email reply still works.
+  visitorId   String?  @unique
+  visitorName String?
+  visitorEmail String?
+  // If the visitor happens to be a logged-in client, link the ticket
+  // to their User row so it shows up alongside their expert DMs.
+  visitorUserId String?
+  visitorUser   User?    @relation("SupportVisitor", fields: [visitorUserId], references: [id], onDelete: SetNull)
   status      String   @default("OPEN") // OPEN | PENDING | CLOSED
   assigneeId  String?
   assignee    User?    @relation("SupportAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
@@ -482,9 +502,11 @@ model SupportTicket {
 
   messages    SupportMessage[]
   attachments SupportAttachment[]
+  presence    SupportPresence[]
 
   @@index([status, lastMessageAt])
   @@index([fromEmail])
+  @@index([channel, status])
 }
 
 model SupportMessage {
@@ -493,12 +515,21 @@ model SupportMessage {
   ticket      SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
   // Direction: "INBOUND" (from customer) | "OUTBOUND" (admin reply)
   direction   String
+  // Channel this individual message was sent on. Inherited from the
+  // ticket at create time but stored per row so a single thread can
+  // span email + web (e.g. admin replies via web, customer comes back
+  // via email — threading still works via Message-ID chain).
+  channel     String   @default("email")
   // Sender: "customer" for inbound, the admin user's name/email for outbound
   fromEmail   String
   fromName    String?
-  // Resend email_id for the outbound message, or their email_id for inbound
+  // Resend email_id for the outbound message, or their email_id for inbound.
+  // Null for web-channel messages (no Resend involvement).
   resendId    String?  @unique
-  // RFC 5322 Message-ID header (for threading via In-Reply-To)
+  // RFC 5322 Message-ID header. For web-channel messages we mint a
+  // synthetic one so the threading chain stays uniform — this is what
+  // makes email-replies-to-a-web-thread still land on the right ticket
+  // when the visitor later emails support@.
   messageId   String   @unique
   inReplyTo   String?
   references  String?
@@ -506,7 +537,7 @@ model SupportMessage {
   // from text by lib/email-templates)
   bodyText    String
   bodyHtml    String
-  // For inbound, the raw raw from the Resend webhook event (debug aid)
+  // For inbound email, the raw raw from the Resend webhook event (debug aid)
   raw         String?
   // Set true on the first message of a ticket (used by the inbox list)
   isFirst     Boolean  @default(false)
@@ -515,6 +546,7 @@ model SupportMessage {
   attachments SupportAttachment[]
 
   @@index([ticketId, createdAt])
+  @@index([channel])
 }
 
 model SupportAttachment {
@@ -524,9 +556,10 @@ model SupportAttachment {
   messageId   String?
   message     SupportMessage? @relation(fields: [messageId], references: [id], onDelete: Cascade)
   // Resend's attachment id; we fetch bytes on demand via the Resend
-  // SDK and re-host on our CDN. For now we store the URL + metadata
-  // and proxy downloads through /api/admin/support/attachments/[id].
-  resendAttachmentId String
+  // SDK and re-host on our CDN. Null for web-channel attachments
+  // uploaded directly via /api/support/attachments/upload (which go to
+  // Vercel Blob and write `storedUrl`).
+  resendAttachmentId String?
   filename    String
   contentType String
   size        Int
@@ -535,4 +568,55 @@ model SupportAttachment {
   createdAt   DateTime @default(now())
 
   @@index([ticketId])
+}
+
+// ============================================================
+// Livechat / support realtime presence (SSE-driven widget)
+// ============================================================
+// One row per active subscription window per ticket. Used by the
+// /api/support/stream/[ticketId] SSE endpoint to know which event
+// streamers to fan out to, and to render "Customer is typing…"
+// / "Online now" indicators in the admin thread.
+//
+// Rows are upserted on every SSE heartbeat + on every sendMessage /
+// typing / read call. A periodic cleanup (run by the SSE route
+// itself on each new connection) deletes rows older than 60 s — that
+// gives us presence + typing without a separate worker process.
+model SupportPresence {
+  id         String   @id @default(cuid())
+  ticketId   String
+  ticket     SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  // "admin" for the dashboard watcher, "visitor" for the widget.
+  // Picked at subscribe time from the auth/session context.
+  actorKind  String
+  // For admin: user.id. For visitor: visitorId (the cookie uuid).
+  actorId    String
+  // Set true while the actor is typing; cleared after a 4 s TTL
+  // (driven by the next heartbeat from the client).
+  isTyping   Boolean  @default(false)
+  lastSeenAt DateTime @default(now())
+
+  @@unique([ticketId, actorKind, actorId])
+  @@index([ticketId])
+  @@index([lastSeenAt])
+}
+
+// ============================================================
+// Web push (admin-only in v1)
+// ============================================================
+// One row per admin device that's subscribed to push notifications
+// for new tickets + customer replies. Visitor push is intentionally
+// out of scope (chat widget is the surface).
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  // Standard Web Push endpoint URL allocated by the browser.
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userAgent String?
+  createdAt DateTime @default(now())
+  lastUsedAt DateTime @default(now())
+
+  @@index([userId])
 }

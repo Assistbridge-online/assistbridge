@@ -5,7 +5,24 @@ import { Card } from "@/components/ui/card";
 import { StatusBadge } from "@/components/dashboard-widgets";
 import { SupportTicketClient } from "@/components/admin/support-ticket-client";
 import { formatDate } from "@/lib/utils";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Mail, Globe } from "lucide-react";
+
+function ChannelChip({ channel }: { channel: string }) {
+  if (channel === "web") {
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary-50 text-primary-700 text-[11px] font-semibold uppercase tracking-wide">
+        <Globe className="h-3 w-3" />
+        Web chat
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[11px] font-semibold uppercase tracking-wide">
+      <Mail className="h-3 w-3" />
+      Email
+    </span>
+  );
+}
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Admin · Support ticket" };
@@ -29,8 +46,11 @@ export default async function SupportTicketPage({
     id: ticket.id,
     subject: ticket.subject,
     status: ticket.status,
+    channel: ticket.channel,
     fromEmail: ticket.fromEmail,
     fromName: ticket.fromName,
+    visitorName: ticket.visitorName,
+    visitorEmail: ticket.visitorEmail,
     createdAt: ticket.createdAt.toISOString(),
     lastMessageAt: ticket.lastMessageAt.toISOString(),
     assignee: ticket.assignee
@@ -39,6 +59,7 @@ export default async function SupportTicketPage({
     messages: ticket.messages.map((m) => ({
       id: m.id,
       direction: m.direction,
+      channel: m.channel,
       fromEmail: m.fromEmail,
       fromName: m.fromName,
       bodyText: m.bodyText,
@@ -55,6 +76,7 @@ export default async function SupportTicketPage({
       contentType: a.contentType,
       size: a.size,
       messageId: a.messageId,
+      storedUrl: a.storedUrl,
     })),
   };
 
@@ -74,6 +96,7 @@ export default async function SupportTicketPage({
               {ticket.subject}
             </h1>
             <StatusBadge status={ticket.status} />
+            <ChannelChip channel={ticket.channel} />
           </div>
           <p className="mt-1 text-slate-600">
             <span className="font-medium text-slate-700">
