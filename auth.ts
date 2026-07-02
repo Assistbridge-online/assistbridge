@@ -108,11 +108,16 @@ const authSecret =
     : undefined);
 
 if (!authSecret && process.env.NODE_ENV === "production") {
-  // Fail loud at module load in prod rather than mid-request. Logs the
-  // exact variable name operators should set so the fix is obvious.
-  console.error(
+  // Fail loud at module load in prod rather than mid-request. Without a
+  // secret, @auth/core will throw MissingSecret on the FIRST credential
+  // sign-in that needs a fresh JWT — masking it as a generic
+  // /api/auth/error "Configuration" page. Better to crash the route
+  // handler up front with an actionable message.
+  throw new Error(
     "[auth] Missing JWT signing secret. Set AUTH_SECRET (preferred in " +
-      "next-auth v5) or NEXTAUTH_SECRET (legacy v4) in your environment.",
+      "next-auth v5) or NEXTAUTH_SECRET (legacy v4) in your Vercel " +
+      "project environment variables (Project → Settings → Environment " +
+      "Variables). The app cannot start in production without one.",
   );
 }
 
