@@ -58,7 +58,15 @@ function LoginForm() {
       });
 
       if (!result || result.error) {
-        setServerError("Invalid email or password.");
+        // result.error values include "CredentialsSignin" (bad password) and
+        // "Configuration" (server-side config issue). Surface both so we
+        // don't silently loop.
+        console.error("[login] signIn failed:", result);
+        const msg =
+          result?.error === "Configuration"
+            ? "Login is temporarily unavailable. Please try again shortly."
+            : "Invalid email or password.";
+        setServerError(msg);
         return;
       }
 

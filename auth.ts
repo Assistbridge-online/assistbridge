@@ -2,7 +2,6 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
@@ -40,8 +39,14 @@ if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
   providers.push(GitHub({ clientId: process.env.GITHUB_CLIENT_ID, clientSecret: process.env.GITHUB_CLIENT_SECRET, allowDangerousEmailAccountLinking: true } as any));
 }
 
+// IMPORTANT: session strategy is JWT (set in auth.config.ts), so we do NOT
+// need a database adapter here. Keeping PrismaAdapter causes the dashboard
+// layout's `auth()` call to hit the DB on every render; if the user table is
+// empty (e.g. account created via Neon Auth dashboard) or schema-drifted, the
+// adapter silently returns no session and the layout redirects to /login
+// even though the JWT is valid. JWT-only is the right model for credentials
+// + OAuth-with-allowDangerousEmailAccountLinking.
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
-  adapter: PrismaAdapter(prisma),
   providers,
 });
