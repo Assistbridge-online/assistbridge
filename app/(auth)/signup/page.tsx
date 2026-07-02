@@ -79,7 +79,7 @@ function SignupPageInner() {
   const [pendingOrder, setPendingOrder] = useState<FormData | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<{ email: string; role: UserRole; orderId?: string } | null>(null);
+  const [success, setSuccess] = useState<{ email: string; role: UserRole; orderId?: string; emailWarning?: string } | null>(null);
   const [pending, startTransition] = useTransition();
 
   // Parse pending order from URL params
@@ -137,7 +137,7 @@ function SignupPageInner() {
         }
       }
 
-      setSuccess({ email: result.email, role: result.role, orderId });
+      setSuccess({ email: result.email, role: result.role, orderId, emailWarning: result.emailWarning });
     });
   };
 
@@ -180,6 +180,15 @@ function SignupPageInner() {
             <p className="mt-3 text-xs text-slate-500">
               Didn&apos;t get the email? Check your spam folder or try again in a few minutes.
             </p>
+            {success.emailWarning && (
+              <div
+                role="alert"
+                className="mt-4 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-left text-xs text-amber-800"
+              >
+                <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+                <span>{success.emailWarning}</span>
+              </div>
+            )}
             <div className="mt-6">
               <Button variant="outline" onClick={() => router.push("/login")} className="w-full">
                 Back to sign in

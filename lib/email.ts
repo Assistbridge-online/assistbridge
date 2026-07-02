@@ -5,6 +5,24 @@ const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
 
+/**
+ * Default From address.
+ *
+ * Resolution order:
+ *  1. process.env.EMAIL_FROM — explicit override (e.g.
+ *     "AssistBridge <support@assistbridge.online>"). This is the value the
+ *     Resend dashboard must have a verified sender for, otherwise the API
+ *     returns 403.
+ *  2. `siteConfig.email` — fallback (uses `info@assistbridge.online` by
+ *     default; only used for local dev where Resend isn't configured).
+ *
+ * If EMAIL_FROM is set but on an unverified Resend domain, sending will
+ * fail with `domain is not verified` — that's the same failure we used to
+ * see silently. The caller (signUp / etc.) is now responsible for
+ * surfacing that failure to the user.
+ */
+const defaultFrom = process.env.EMAIL_FROM || `AssistBridge <${siteConfig.email}>`;
+
 interface SendEmailParams {
   to: string | string[];
   subject: string;
@@ -22,11 +40,16 @@ export async function sendEmail({
   from,
   replyTo,
 }: SendEmailParams) {
-  const fromAddress = from ?? `AssistBridge <${siteConfig.email}>`;
+  const fromAddress = from ?? defaultFrom;
   const recipients = Array.isArray(to) ? to : [to];
 
   if (!resend) {
-    console.log("[email:dev]", { to: recipients, subject, text: text ?? html });
+    console.log("[email:dev]", {
+      to: recipients,
+      from: fromAddress,
+      subject,
+      text: text ?? html,
+    });
     return { id: "dev-mode", success: true as const };
   }
 
@@ -41,13 +64,29 @@ export async function sendEmail({
     });
 
     if (result.error) {
-      console.error("[email:error]", result.error);
+      console.error("[email:error]", {
+        from: fromAddress,
+        to: recipients,
+        subject,
+        error: result.error,
+      });
       return { id: null, success: false as const, error: result.error };
     }
 
+    console.log("[email:sent]", {
+      id: result.data?.id,
+      from: fromAddress,
+      to: recipients,
+      subject,
+    });
     return { id: result.data?.id ?? null, success: true as const };
   } catch (error) {
-    console.error("[email:exception]", error);
+    console.error("[email:exception]", {
+      from: fromAddress,
+      to: recipients,
+      subject,
+      error,
+    });
     return { id: null, success: false as const, error };
   }
 }

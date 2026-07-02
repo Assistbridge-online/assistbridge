@@ -74,7 +74,7 @@ export async function signUp(input: {
   email: string;
   password: string;
   role: "CLIENT" | "EXPERT";
-}): Promise<ActionResult<{ email: string; role: UserRole }>> {
+}): Promise<ActionResult<{ email: string; role: UserRole; emailWarning?: string }>> {
   const parsed = signUpSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: "Please check your details and try again." };
@@ -113,18 +113,32 @@ export async function signUp(input: {
   const baseUrl = await getBaseUrl();
   const verifyUrl = `${baseUrl}/api/auth/verify-email?token=${token}`;
 
+  // Send verification + welcome. If either fails, surface it to the
+  // caller — the user already has an account (we just created it), but
+  // they need to know the email didn't go out so they can retry or
+  // contact support instead of waiting for a message that'll never come.
+  let emailSent = true;
+  let emailWarning: string | undefined;
+
   try {
     const html = verificationEmailHtml({
       name: user.name || "there",
       verifyUrl,
       siteName: siteConfig.name,
     });
-    await sendEmail({
+    const verifyResult = await sendEmail({
       to: email,
       subject: `Verify your ${siteConfig.name} email`,
       html,
       text: `Hi ${user.name || "there"},\n\nWelcome to ${siteConfig.name}. Please verify your email by visiting:\n${verifyUrl}\n\nThis link expires in 24 hours.`,
     });
+    if (!verifyResult.success) {
+      emailSent = false;
+      console.error("[signUp] verification email send failed", {
+        email,
+        error: verifyResult.error,
+      });
+    }
 
     const welcomeHtml = welcomeEmailHtml({
       name: user.name || "there",
@@ -132,17 +146,33 @@ export async function signUp(input: {
       siteName: siteConfig.name,
       loginUrl: `${baseUrl}/login`,
     });
-    await sendEmail({
+    const welcomeResult = await sendEmail({
       to: email,
       subject: `Welcome to ${siteConfig.name}`,
       html: welcomeHtml,
       text: `Hi ${user.name || "there"},\n\nWelcome to ${siteConfig.name}! Your account has been created. Sign in at ${baseUrl}/login`,
     });
+    if (!welcomeResult.success) {
+      emailSent = false;
+      console.error("[signUp] welcome email send failed", {
+        email,
+        error: welcomeResult.error,
+      });
+    }
   } catch (err) {
-    console.error("[signUp] Failed to send verification email:", err);
+    emailSent = false;
+    console.error("[signUp] email send threw", { email, err });
   }
 
-  return { ok: true, email, role };
+  if (!emailSent) {
+    emailWarning =
+      "Your account was created, but we couldn't send the verification email. " +
+      "Please try signing in — if that works, your account is fine and you can " +
+      "request a new verification link from the login page. If sign-in fails, " +
+      "contact support@assistbridge.online.";
+  }
+
+  return { ok: true, email, role, emailWarning };
 }
 
 export async function loginAction(
