@@ -9,7 +9,7 @@ import { z } from "zod";
 import { Mail, Lock, Eye, EyeOff, AlertCircle, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { signInWithCredentials } from "@/lib/actions/auth";
+import { signIn } from "next-auth/react";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -47,15 +47,16 @@ function LoginForm() {
   const onSubmit = (values: LoginInput) => {
     setServerError(null);
     startTransition(async () => {
-      const result = await signInWithCredentials({
+      const result = await signIn("credentials", {
         email: values.email,
         password: values.password,
+        redirect: false,
       });
-      if (!result.ok) {
-        setServerError(result.error);
+      if (result?.error) {
+        setServerError("Invalid email or password.");
         return;
       }
-      router.push(result.redirectTo || callbackUrl);
+      router.push(callbackUrl);
       router.refresh();
     });
   };
