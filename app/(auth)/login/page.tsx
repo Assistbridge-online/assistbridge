@@ -3,13 +3,13 @@
 import { useState, useTransition, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Mail, Lock, Eye, EyeOff, AlertCircle, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { loginAction } from "@/lib/actions/auth";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -46,12 +46,25 @@ function LoginForm() {
   const onSubmit = (values: LoginInput) => {
     setServerError(null);
     startTransition(async () => {
-      const result = await loginAction(values.email, values.password, callbackUrl);
-      if (result && !result.ok) {
-        setServerError(result.error);
+      // Use next-auth/react's client signIn so the credentials callback sets
+      // the session cookie in the browser. Server-action signIn with
+      // `redirect: false` does not propagate Set-Cookie to the client, which
+      // is why the page was refreshing back to /login.
+      const result = await signIn("credentials", {
+        email: values.email,
+        password: values.password,
+        redirect: false,
+        callbackUrl,
+      });
+
+      if (!result || result.error) {
+        setServerError("Invalid email or password.");
         return;
       }
-      window.location.href = callbackUrl;
+
+      // Hard navigate so the freshly-set session cookie is sent on the next
+      // request to the dashboard.
+      window.location.href = result.url || callbackUrl;
     });
   };
 
@@ -59,7 +72,6 @@ function LoginForm() {
     setServerError(null);
     startTransition(async () => {
       try {
-        const { signIn } = await import("next-auth/react");
         await signIn(provider, { callbackUrl });
       } catch {
         setServerError("Unable to start OAuth flow. Please try again.");
