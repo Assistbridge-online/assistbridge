@@ -12,6 +12,7 @@
     "db:seed:demo": "tsx prisma/seed-demo.ts",
     "db:studio": "prisma studio",
     "admin:provision": "tsx prisma/seed-admin.ts",
+    "db:seed:backlinks": "tsx --env-file=.env prisma/seed-backlink-posts.ts",
     "db:reset": "prisma db push --force-reset && npm run db:seed:demo",
     "db:reset:clean": "prisma db push --force-reset && npm run db:seed",
     "postinstall": "npx prisma generate"
