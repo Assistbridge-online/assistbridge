@@ -56,6 +56,11 @@ export const metadata: Metadata = {
   },
   alternates: { canonical: siteConfig.url },
   robots: { index: true, follow: true },
+  verification: {
+    other: {
+      "p:domain_verify": "b6d44b0d1535522b72db389af33db10b",
+    },
+  },
   icons: {
     icon: "/assistbridge-logo.png",
     apple: "/assistbridge-logo.png",
