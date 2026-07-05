@@ -30,10 +30,11 @@ export const metadata = { title: "Admin · Support ticket" };
 export default async function SupportTicketPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   const ticket = await prisma.supportTicket.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       messages: { orderBy: { createdAt: "asc" } },
       attachments: true,
