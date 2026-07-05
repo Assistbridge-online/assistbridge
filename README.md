@@ -140,6 +140,7 @@ All variables documented in `.env.example`. Required for production:
 | `NEXTAUTH_SECRET` | ✓ | Random 32-byte string for session signing |
 | `NEXTAUTH_URL` | ✓ | Your site URL (`https://assistbridge.online`) |
 | `RESEND_API_KEY` | for email | Send transactional email |
+| `RESEND_WEBHOOK_SECRET` | for inbound email | Verify Resend inbound webhook signatures |
 | `STRIPE_SECRET_KEY` | for payments | Stripe server-side |
 | `STRIPE_WEBHOOK_SECRET` | for payments | Webhook signature verification |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | for payments | Stripe client-side |
