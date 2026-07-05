@@ -62,7 +62,7 @@ export default async function NewOrderPage() {
           </div>
           <div>
             <div className="text-sm font-bold text-slate-900">2. Secure payment</div>
-            <p className="text-xs text-slate-500 leading-relaxed mt-0.5">Pay through Stripe or PayPal. Payment is held until you approve the work.</p>
+            <p className="text-xs text-slate-500 leading-relaxed mt-0.5">Pay through Stripe or Paystack. Payment is held until you approve the work.</p>
           </div>
         </div>
         <div className="flex items-start gap-3 p-4 rounded-xl bg-white border border-slate-200">

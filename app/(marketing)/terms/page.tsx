@@ -18,7 +18,7 @@ const sections = [
   {
     icon: CreditCard,
     title: "Quotes, Payment & Refunds",
-    body: "When you approve a quote, you authorize us to charge your payment method. Funds are held in escrow until you approve the delivered work (or 7 days after delivery, whichever comes first). All payments go through Stripe or PayPal — we never see your card details.",
+    body: "When you approve a quote, you authorize us to charge your payment method. Funds are held in escrow until you approve the delivered work (or 7 days after delivery, whichever comes first). All payments go through Stripe or Paystack — we never see your card details.",
     link: { href: "/refund", label: "See our Refund Policy" },
   },
   {

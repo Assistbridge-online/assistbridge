@@ -27,7 +27,7 @@ const sections = [
   {
     icon: Users,
     title: "Third-Party Cookies",
-    body: "Stripe and PayPal set cookies during checkout to process payments securely. Cloudflare sets a few for security. We never use advertising or cross-site tracking cookies.",
+    body: "Stripe and Paystack set cookies during checkout to process payments securely. Cloudflare sets a few for security. We never use advertising or cross-site tracking cookies.",
   },
   {
     icon: Shield,

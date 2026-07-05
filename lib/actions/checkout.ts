@@ -11,11 +11,14 @@ import { siteConfig } from "@/lib/site";
 import {
   payOrderWithStripe,
   payOrderWithPayPal,
+  payOrderWithPaystack,
   markOrderPaid,
   releaseFundsToExpert,
   refundOrder,
   completePayPalPayment,
+  completePaystackPayment,
 } from "@/lib/actions/payment";
+import { initializeTransaction, verifyTransaction, isPaystackConfigured } from "@/lib/paystack";
 
 export type CheckoutData = {
   title: string;
@@ -61,6 +64,33 @@ export async function startPayPalCheckout(formData: FormData) {
   try {
     const { url } = await payOrderWithPayPal(orderId);
     if (url) redirect(url);
+  } catch (e) {
+    return { error: (e as Error).message };
+  }
+}
+
+export async function startPaystackCheckout(formData: FormData) {
+  const orderId = String(formData.get("orderId") || "");
+  if (!orderId) return { error: "Missing orderId" };
+  if (!isPaystackConfigured()) {
+    return { error: "Paystack is not configured. Please set PAYSTACK_SECRET_KEY and NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY." };
+  }
+  try {
+    const { url } = await payOrderWithPaystack(orderId);
+    if (url) redirect(url);
+  } catch (e) {
+    return { error: (e as Error).message };
+  }
+}
+
+export async function completePaystack(formData: FormData) {
+  const orderId = String(formData.get("orderId") || "");
+  const reference = String(formData.get("reference") || "");
+  if (!orderId || !reference) return { error: "Missing data" };
+  try {
+    await completePaystackPayment(orderId, reference);
+    revalidatePath(`/dashboard/orders/${orderId}`);
+    return { success: true };
   } catch (e) {
     return { error: (e as Error).message };
   }
@@ -164,6 +194,21 @@ export async function submitAndPayWithPayPal(formData: FormData) {
     return { ok: false, error: "No checkout URL returned", orderId };
   } catch (e) {
     console.error("[submitAndPayWithPayPal]", e);
+    return { ok: false, error: (e as Error).message };
+  }
+}
+
+export async function submitAndPayWithPaystack(formData: FormData) {
+  try {
+    const orderId = await createOrderFromForm(formData, true);
+    if (!orderId) return { error: "Failed to create order" };
+    const { url } = await payOrderWithPaystack(orderId);
+    if (url) {
+      return { ok: true, url, orderId };
+    }
+    return { ok: false, error: "No checkout URL returned", orderId };
+  } catch (e) {
+    console.error("[submitAndPayWithPaystack]", e);
     return { ok: false, error: (e as Error).message };
   }
 }

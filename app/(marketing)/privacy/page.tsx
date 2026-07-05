@@ -8,7 +8,7 @@ const sections = [
   {
     icon: FileText,
     title: "What We Collect",
-    body: "The basics: your name, email, and password (hashed). Plus profile details you choose to share, order history and messages, and basic device/usage data so the site works. Payment info is handled entirely by Stripe and PayPal — we never see your card details.",
+    body: "The basics: your name, email, and password (hashed). Plus profile details you choose to share, order history and messages, and basic device/usage data so the site works. Payment info is handled entirely by Stripe and Paystack — we never see your card details.",
   },
   {
     icon: Eye,
@@ -18,7 +18,7 @@ const sections = [
   {
     icon: Users,
     title: "Who We Share It With",
-    body: "Experts see your name and project details when matched. Our payment and infrastructure partners (Stripe, PayPal, hosting, email) see only what they need to do their job. We will never share your data with advertisers, and we will only disclose to legal authorities when strictly required by law.",
+    body: "Experts see your name and project details when matched. Our payment and infrastructure partners (Stripe, Paystack, hosting, email) see only what they need to do their job. We will never share your data with advertisers, and we will only disclose to legal authorities when strictly required by law.",
   },
   {
     icon: Server,

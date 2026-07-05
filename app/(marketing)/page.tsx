@@ -75,8 +75,8 @@ export default async function HomePage() {
       icon: CreditCard,
       iconBg: "bg-sky-100 text-sky-700",
       t: "Pay securely and start",
-      d: "Once you approve the quote, you pay through Stripe or PayPal. Your expert is notified and starts work immediately. We never see your card details.",
-      points: ["Pay via Stripe or PayPal", "Payment held until approval", "Expert starts work"],
+d: "Once you approve the quote, you pay through Stripe or Paystack. Your expert is notified and starts work immediately. We never see your card details.",
+      points: ["Pay via Stripe or Paystack", "Payment held until approval", "Expert starts work"],
       img: "https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?w=900&q=80",
       alt: "Hand holding a credit card over a secure online checkout form",
     },
@@ -536,7 +536,7 @@ export default async function HomePage() {
                 </h2>
                 <p className="mt-4 text-base text-slate-300 max-w-xl leading-relaxed">
                   Post your first project in under five minutes. Get matched with a vetted
-                  expert, pay securely through Stripe or PayPal, and release payment only when the
+                  expert, pay securely through Stripe or Paystack, and release payment only when the
                   work is done.
                 </p>
                 <div className="mt-7 flex flex-wrap gap-3">

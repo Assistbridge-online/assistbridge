@@ -49,6 +49,7 @@ const paymentMethods = [
   { name: "Visa", src: "https://cdn.jsdelivr.net/npm/payment-icons@1.0.0/min/flat/visa.svg" },
   { name: "Mastercard", src: "https://cdn.jsdelivr.net/npm/payment-icons@1.0.0/min/flat/mastercard.svg" },
   { name: "PayPal", src: "https://cdn.jsdelivr.net/npm/payment-icons@1.0.0/min/flat/paypal.svg" },
+  { name: "Paystack", src: "https://cdn.brandfetch.io/paystack.com/idP_UAmTZL/w/512/h/106/theme/light/logo.png" },
   { name: "Apple Pay", src: "https://cdn.simpleicons.org/applepay/white" },
   { name: "Google Pay", src: "https://cdn.simpleicons.org/googlepay" },
   { name: "Amex", src: "https://cdn.jsdelivr.net/npm/payment-icons@1.0.0/min/flat/amex.svg" },
