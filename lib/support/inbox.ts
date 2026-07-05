@@ -230,7 +230,7 @@ async function fetchAndParse(evt: InboundEvent): Promise<ParsedInbound> {
 
   if (resend) {
     try {
-      const resp: any = await (resend as any).emails.retrieve(email_id);
+      const resp: any = await (resend as any).emails.get(email_id);
       const email = resp?.data ?? resp;
       if (email) {
         bodyText = email.text ?? email.body_plain ?? "";
