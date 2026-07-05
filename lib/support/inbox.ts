@@ -230,15 +230,11 @@ async function fetchAndParse(evt: InboundEvent): Promise<ParsedInbound> {
 
   if (resend) {
     try {
-      // Resend SDK: emails.get(emailId, { headers: true }) returns
-      // the message including headers + body text/html.
-      const resp: any = await (resend as any).emails.get?.(email_id, {
-        headers: true,
-      });
+      const resp: any = await (resend as any).emails.retrieve(email_id);
       const email = resp?.data ?? resp;
       if (email) {
-        bodyText = email.text ?? "";
-        bodyHtml = email.html ?? "";
+        bodyText = email.text ?? email.body_plain ?? "";
+        bodyHtml = email.html ?? email.body_html ?? "";
         const hdrs = email.headers ?? {};
         for (const [k, v] of Object.entries(hdrs)) {
           rawHeaders[k.toLowerCase()] = String(v);
@@ -256,15 +252,11 @@ async function fetchAndParse(evt: InboundEvent): Promise<ParsedInbound> {
       }
     } catch (err) {
       console.error("[support:inbound:fetch-failed]", { email_id, err });
-      // We still record the metadata so the admin sees the message
-      // arrived — body just stays empty.
     }
   }
 
-  // Dev-mode (no Resend): use the metadata we already have so the
-  // ticket row gets created with at least a placeholder body.
   if (!bodyText && !bodyHtml) {
-    bodyText = `[inbound preview unavailable — Resend not configured]\nFrom: ${from}\nSubject: ${subject}`;
+    bodyText = `From: ${from}\nSubject: ${subject}`;
   }
 
   return {
