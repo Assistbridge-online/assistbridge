@@ -189,7 +189,7 @@ export default async function CalculatorPage() {
                 i: <GraduationCap className="h-5 w-5" />,
                 n: "3",
                 t: "Pay and we start work",
-                d: "Pay through Stripe or PayPal. Payment is held until you approve the final delivery. Most matches happen in under 4 hours.",
+                d: "Pay through Stripe or Paystack. Payment is held until you approve the final delivery. Most matches happen in under 4 hours.",
               },
             ].map((s) => (
               <Card key={s.n} className="p-6 hover:shadow-md transition-shadow">

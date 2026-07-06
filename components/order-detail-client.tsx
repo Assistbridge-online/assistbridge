@@ -15,10 +15,18 @@ import { toast } from "sonner";
 import {
   startStripeCheckout,
   startPayPalCheckout,
+  startPaystackCheckout,
   releaseFundsAction,
   requestRevisionAction,
   markCompleteAction,
 } from "@/lib/actions/checkout";
+
+type Gateway = "stripe" | "paystack";
+
+const GATEWAYS: { id: Gateway; label: string; icon: typeof Wallet }[] = [
+  { id: "stripe", label: "Stripe", icon: CreditCard },
+  { id: "paystack", label: "Paystack", icon: Wallet },
+];
 
 interface OrderData {
   id: string;
@@ -41,13 +49,15 @@ function PaymentErrorBanner() {
   const error = searchParams.get("error");
   const gateway = searchParams.get("gateway");
   if (error !== "payment") return null;
+  const niceName =
+    gateway === "stripe" ? "Stripe" : gateway === "paypal" ? "PayPal" : gateway === "paystack" ? "Paystack" : "Payment";
   return (
     <div className="mb-5 p-4 rounded-lg bg-amber-50 border border-amber-200 flex items-start gap-3">
       <AlertCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
       <div className="flex-1">
         <h3 className="font-semibold text-amber-900">Payment setup incomplete</h3>
         <p className="text-sm text-amber-800 mt-1">
-          {gateway === "stripe" ? "Stripe" : "PayPal"} is not configured yet, so we couldn&apos;t process your payment. Your order has been saved. Try paying again, or contact support.
+          {niceName} is not configured yet, so we couldn&apos;t process your payment. Your order has been saved. Try paying again, or contact support.
         </p>
       </div>
     </div>
@@ -58,7 +68,7 @@ export function OrderDetailClient({ order }: { order: OrderData }) {
   const [tab, setTab] = useState("messages");
   const [newMessage, setNewMessage] = useState("");
   const [pending, startTransition] = useTransition();
-  const [selectedGateway, setSelectedGateway] = useState<"stripe" | "paypal">("stripe");
+  const [selectedGateway, setSelectedGateway] = useState<Gateway>("stripe");
 
   function sendMessage(e: React.FormEvent) {
     e.preventDefault();
@@ -67,11 +77,16 @@ export function OrderDetailClient({ order }: { order: OrderData }) {
     setNewMessage("");
   }
 
-  function handlePay(gateway: "stripe" | "paypal") {
+  function handlePay(gateway: Gateway) {
     const fd = new FormData();
     fd.append("orderId", order.id);
     startTransition(async () => {
-      const action = gateway === "stripe" ? startStripeCheckout : startPayPalCheckout;
+      const action =
+        gateway === "stripe"
+          ? startStripeCheckout
+          : gateway === "paypal"
+          ? startPayPalCheckout
+          : startPaystackCheckout;
       const res = await action(fd);
       if (res && "error" in res) {
         toast.error(res.error);
@@ -116,23 +131,24 @@ export function OrderDetailClient({ order }: { order: OrderData }) {
           {(order.status === "QUOTED" || order.status === "DRAFT") && (
             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
               <div className="flex rounded-lg border border-slate-200 overflow-hidden">
-                <button
-                  type="button"
-                  onClick={() => setSelectedGateway("stripe")}
-                  className={`px-3 py-2 text-sm font-medium transition ${selectedGateway === "stripe" ? "bg-primary-700 text-white" : "bg-white text-slate-700 hover:bg-slate-50"}`}
-                >
-                  Card
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSelectedGateway("paypal")}
-                  className={`px-3 py-2 text-sm font-medium transition ${selectedGateway === "paypal" ? "bg-primary-700 text-white" : "bg-white text-slate-700 hover:bg-slate-50"}`}
-                >
-                  PayPal
-                </button>
+                {GATEWAYS.map((g) => (
+                  <button
+                    key={g.id}
+                    type="button"
+                    onClick={() => setSelectedGateway(g.id)}
+                    className={`px-3 py-2 text-sm font-medium transition border-r last:border-r-0 border-slate-200 ${
+                      selectedGateway === g.id ? "bg-primary-700 text-white" : "bg-white text-slate-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    {g.label}
+                  </button>
+                ))}
               </div>
               <Button onClick={() => handlePay(selectedGateway)} loading={pending}>
-                {selectedGateway === "stripe" ? <CreditCard className="h-4 w-4" /> : <Wallet className="h-4 w-4" />}
+                {(() => {
+                  const Icon = GATEWAYS.find((g) => g.id === selectedGateway)?.icon ?? CreditCard;
+                  return <Icon className="h-4 w-4" />;
+                })()}
                 Pay {formatCurrency(order.amount, order.currency)}
               </Button>
             </div>

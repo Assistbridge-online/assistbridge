@@ -1,12 +1,14 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle2, Clock, FileCheck, Users, MessageCircle, ChevronRight } from "lucide-react";
+import Script from "next/script";
+import { CheckCircle2, Clock, FileCheck, Users, MessageCircle, ChevronRight, ArrowRight, Star, Award, ShieldCheck } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PricingCalculator } from "@/components/pricing-calculator";
-import { getServiceBySlug } from "@/lib/content";
+import { getServiceBySlug, getActiveServices } from "@/lib/content";
 import { ServiceIcon } from "@/lib/display";
 import { formatCurrency } from "@/lib/utils";
+import { siteConfig } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +23,11 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
   const { slug } = await params;
   const service = await getServiceBySlug(slug);
   if (!service) notFound();
+
+  const allServices = await getActiveServices();
+  const relatedServices = allServices
+    .filter((s) => s.id !== service.id && (s.category === service.category || (service.discipline && s.disciplineId === service.disciplineId)))
+    .slice(0, 3);
 
   const deliverables = (service.deliverables || "").split("|").map((d) => d.trim()).filter(Boolean);
 
@@ -216,6 +223,157 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
           </aside>
         </div>
       </div>
+
+      {/* Provider / About the expert box (WordPress-style) */}
+      <div className="bg-slate-50 border-y border-slate-200">
+        <div className="mx-auto max-w-6xl px-4 py-12">
+          <div className="grid lg:grid-cols-3 gap-8 items-center">
+            <div className="lg:col-span-2 flex items-start gap-5">
+              <div className="h-20 w-20 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 text-white flex items-center justify-center text-2xl font-bold shrink-0">
+                AB
+              </div>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700">About the provider</p>
+                <h3 className="mt-1 text-2xl font-bold text-slate-900">Vetted experts, hand-picked from {siteConfig.stats.experts}+ applicants</h3>
+                <p className="mt-3 text-sm text-slate-600 leading-relaxed">
+                  Every expert on AssistBridge is interviewed, credential-checked, and trial-reviewed.
+                  For <strong>{service.name}</strong>, we typically assign specialists with at least 3 years
+                  of experience in {service.discipline?.name ?? "their field"} and a track record of high-rated deliveries.
+                </p>
+                <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-slate-700">
+                  <span className="inline-flex items-center gap-1.5">
+                    <Star className="h-4 w-4 text-amber-500 fill-amber-500" /> 4.8/5 average rating
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <ShieldCheck className="h-4 w-4 text-emerald-600" /> 100% payment protection
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <Award className="h-4 w-4 text-emerald-600" /> 14-day revision window
+                  </span>
+                </div>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  <Link
+                    href="/experts"
+                    className="inline-flex items-center gap-1.5 h-9 px-4 rounded-md bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800"
+                  >
+                    Meet our experts <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                  <Link
+                    href="/become-an-expert"
+                    className="inline-flex items-center h-9 px-4 rounded-md border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-white"
+                  >
+                    Apply to join
+                  </Link>
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-3 text-center">
+              {[
+                { v: `${siteConfig.stats.tasksCompleted}+`, l: "Tasks delivered" },
+                { v: `${siteConfig.stats.experts}+`, l: "Vetted experts" },
+                { v: `${siteConfig.stats.countriesServed}+`, l: "Countries" },
+              ].map((s) => (
+                <div key={s.l} className="rounded-xl border border-slate-200 bg-white p-4">
+                  <div className="text-2xl font-bold text-slate-900">{s.v}</div>
+                  <div className="mt-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">{s.l}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Related services */}
+      {relatedServices.length > 0 && (
+        <div>
+          <div className="mx-auto max-w-6xl px-4 py-12 md:py-16">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">You may also need</p>
+                <h2 className="mt-2 text-2xl md:text-3xl font-bold tracking-tight text-slate-900">
+                  Related services
+                </h2>
+              </div>
+              <Link href="/services" className="text-sm font-semibold text-slate-700 hover:text-slate-900 inline-flex items-center gap-1.5">
+                All services <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {relatedServices.map((rs) => (
+                <Link
+                  key={rs.id}
+                  href={`/services/${rs.slug}`}
+                  className="group block rounded-2xl border border-slate-200 bg-white p-5 hover:border-slate-300 hover:shadow-md transition-all"
+                >
+                  <div className="h-10 w-10 rounded-lg bg-slate-100 text-slate-700 group-hover:bg-slate-900 group-hover:text-white flex items-center justify-center transition-colors">
+                    <ServiceIcon name={rs.icon} />
+                  </div>
+                  <h3 className="mt-4 text-base font-bold tracking-tight text-slate-900 group-hover:text-emerald-700">
+                    {rs.name}
+                  </h3>
+                  <p className="mt-1.5 text-sm text-slate-600 line-clamp-2 leading-relaxed">
+                    {rs.shortDescription ?? rs.description}
+                  </p>
+                  <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
+                    <span>From {formatCurrency(rs.pricePerPage)}/{rs.pageUnit}</span>
+                    <ArrowRight className="h-3.5 w-3.5 text-slate-300 group-hover:text-slate-900 group-hover:translate-x-1 transition-all" />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* FAQ Schema */}
+      <Script id="faq-schema" type="application/ld+json" strategy="beforeInteractive">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: [
+            {
+              "@type": "Question",
+              name: `How much does ${service.name} cost?`,
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: `Pricing starts at ${formatCurrency(service.pricePerPage)} per ${service.pageUnit} with a minimum of ${service.minPages} ${service.pageUnit}s. The final price depends on the academic level, deadline, and complexity. Use the pricing calculator on this page for an instant estimate.`,
+              },
+            },
+            {
+              "@type": "Question",
+              name: "What is the turnaround time?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: `Standard delivery is ${service.turnaroundDays} day${service.turnaroundDays === 1 ? "" : "s"}. Rush delivery is available at 1.5x the standard price — use the calculator to compare.`,
+              },
+            },
+            {
+              "@type": "Question",
+              name: "How do I request a revision?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: `You have 14 days from delivery to request unlimited revisions at no extra cost. Simply message your expert through your dashboard with the changes you need.`,
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Is my payment secure?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: `Yes. All payments are processed through Stripe or Paystack, both PCI-compliant payment gateways. Funds are held securely and only released when you approve the final delivery.`,
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Do you offer refunds?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "If the delivered work does not meet the agreed brief, you are eligible for a full refund. We also offer partial refunds for incomplete or unsatisfactory deliveries subject to our refund policy.",
+              },
+            },
+          ],
+        })}
+      </Script>
     </div>
   );
 }

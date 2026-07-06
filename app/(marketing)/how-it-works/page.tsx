@@ -39,8 +39,8 @@ const steps = [
     icon: CreditCard,
     title: "Approve and pay securely",
     description:
-      "Once you approve the quote, you pay through Stripe or PayPal. Your expert is notified and starts work immediately. We never see your card details.",
-    actions: ["Pay via Stripe or PayPal", "Payment held until approval", "Expert starts work"],
+"Once you approve the quote, you pay through Stripe or Paystack. Your expert is notified and starts work immediately. We never see your card details.",
+    actions: ["Pay via Stripe or Paystack", "Payment held until approval", "Expert starts work"],
     img: "https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?w=1000&q=80",
     alt: "Hand holding a credit card over a secure online checkout form",
   },
@@ -67,7 +67,7 @@ const steps = [
 ];
 
 const trust = [
-  { icon: Shield, bg: "bg-emerald-100 text-emerald-700", title: "Payment held until approval", text: "Processed by Stripe or PayPal. Released to the expert only when you approve the work." },
+  { icon: Shield, bg: "bg-emerald-100 text-emerald-700", title: "Payment held until approval", text: "Processed by Stripe or Paystack. Released to the expert only when you approve the work." },
   { icon: Award, bg: "bg-amber-100 text-amber-700", title: "Vetted experts", text: "Every expert is interview-screened, credential-checked, and trial-reviewed." },
   { icon: Clock, bg: "bg-sky-100 text-sky-700", title: "Fast matching", text: "Most clients are matched within 4 hours. Complex tasks within 24 hours." },
   { icon: Sparkles, bg: "bg-violet-100 text-violet-700", title: "14-day revisions", text: "Need a tweak after delivery? Request a revision within 14 days at no extra cost." },
@@ -78,10 +78,10 @@ const faqs = [
   { id: "faq-2", question: "How fast will I be matched with an expert?", answer: "Most clients are matched within 4 hours during business hours. Complex or niche tasks may take up to 24 hours. You will get a notification as soon as a match is ready, and you can review the expert's profile before committing." },
   { id: "faq-3", question: "Can I choose which expert works on my project?", answer: "Yes. We share expert profiles with the quote, including their ratings, sample work, and background. You can request a different expert if the first match is not the right fit, at no extra charge." },
   { id: "faq-4", question: "What if I am not satisfied with the work?", answer: "You have a 14-day revision window after delivery to request changes at no extra cost. If we still cannot resolve the issue, our dispute team will mediate and issue a full or partial refund where appropriate." },
-  { id: "faq-5", question: "Is my payment information safe?", answer: "Yes. All payments are processed by Stripe and PayPal, both PCI-DSS Level 1 certified. We never see or store your card details. Payment is held until you approve the work, then released to the expert." },
+  { id: "faq-5", question: "Is my payment information safe?", answer: "Yes. All payments are processed by Stripe and Paystack, both PCI-DSS Level 1 certified. We never see or store your card details. Payment is held until you approve the work, then released to the expert." },
   { id: "faq-6", question: "Can I communicate with my expert directly?", answer: "Yes. Our in-platform messaging supports text, file attachments, and keeps a full record of every interaction for quality and dispute resolution. You can also share additional briefs, reference material, or feedback at any point." },
   { id: "faq-7", question: "Do experts sign NDAs?", answer: "On request. Just mention it in your brief and we will arrange an NDA before any work begins. This is common for sensitive business, medical, or research work." },
-  { id: "faq-8", question: "What payment methods do you accept?", answer: "All major credit and debit cards via Stripe (Visa, Mastercard, American Express, Discover). Also Apple Pay, Google Pay, and PayPal. Local payment methods like iDEAL, SEPA, and BACS are supported where available." },
+  { id: "faq-8", question: "What payment methods do you accept?", answer: "All major credit and debit cards via Stripe (Visa, Mastercard, American Express, Discover). Apple Pay and Google Pay are supported at checkout. Paystack adds local African payment methods like cards, bank transfer, USSD, and mobile money, depending on your country." },
 ];
 
 export default function HowItWorksPage() {

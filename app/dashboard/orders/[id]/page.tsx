@@ -2,6 +2,18 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { OrderDetailClient } from "@/components/order-detail-client";
 
+function formatGateway(gateway: string): string {
+  switch (gateway.toUpperCase()) {
+    case "STRIPE":
+      return "Stripe";
+    case "PAYPAL":
+      return "PayPal";
+    case "PAYSTACK":
+      return "Paystack";
+    default:
+      return gateway;
+  }
+}
 
 export const dynamic = "force-dynamic";
 const DEMO_ORDERS: Record<string, any> = {
@@ -64,7 +76,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
       deliveries: [],
       messages: [],
       payment: {
-        method: order.payments[0]?.gateway ?? "Pending",
+        method: formatGateway(order.payments[0]?.gateway ?? "Pending"),
         ref: order.payments[0]?.gatewayRef ?? "—",
         status: (order.payments[0]?.status ?? "PENDING") as any,
         date: order.payments[0]?.createdAt.toISOString() ?? "—",

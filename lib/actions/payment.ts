@@ -7,6 +7,12 @@ import { siteConfig } from "@/lib/site";
 import { sendEmail } from "@/lib/email";
 import { createCheckoutSession, createPaymentIntent, refundPayment } from "@/lib/stripe";
 import { createOrder as createPayPalOrder, captureOrder as capturePayPalOrder } from "@/lib/paypal";
+import {
+  initializeTransaction,
+  verifyTransaction,
+  refundTransaction,
+  isSupportedCurrency,
+} from "@/lib/paystack";
 
 async function requireUser() {
   const session = await auth();
@@ -96,6 +102,80 @@ function paypalOrderIdPlaceholder() {
   return "{paypalOrderId}";
 }
 
+export async function payOrderWithPaystack(orderId: string) {
+  const user = await requireUser();
+  const order = await getOrderForClient(orderId, user.id);
+  const amount = order.finalPrice ?? order.budget ?? 0;
+  if (amount <= 0) throw new Error("Invalid order amount");
+
+  if (!isSupportedCurrency(order.currency)) {
+    throw new Error(
+      `Paystack does not support ${order.currency}. Update the order currency to one of: NGN, GHS, ZAR, USD.`
+    );
+  }
+
+  // We use `${orderId}-paystack` as a stable Payment row id so upserts
+  // are idempotent. The Paystack transaction reference is also stashed on
+  // the row when verify confirms the charge (used by refundOrder).
+  await prisma.payment.upsert({
+    where: { id: `${order.id}-paystack` },
+    update: { status: "PENDING" },
+    create: {
+      id: `${order.id}-paystack`,
+      orderId: order.id,
+      gateway: "PAYSTACK",
+      amount,
+      currency: order.currency,
+      status: "PENDING",
+    },
+  });
+
+  const baseUrl = siteConfig.url;
+  const { authorizationUrl, reference } = await initializeTransaction({
+    email: user.email ?? "",
+    amount,
+    currency: order.currency,
+    reference: orderId,
+    callbackUrl: `${baseUrl}/dashboard/orders/${order.id}/paystack/success`,
+    metadata: { orderId: order.id, userId: user.id },
+  });
+
+  // Persist the Paystack reference immediately so webhooks + manual verify
+  // can find the payment row even before the user returns to /success.
+  await prisma.payment.update({
+    where: { id: `${order.id}-paystack` },
+    data: { gatewayRef: reference },
+  });
+
+  return { url: authorizationUrl, reference };
+}
+
+export async function completePaystackPayment(orderId: string, reference: string) {
+  const user = await requireUser();
+  const order = await getOrderForClient(orderId, user.id);
+
+  const txn = await verifyTransaction(reference);
+  if (txn.status !== "success") {
+    throw new Error(`Payment not successful (status: ${txn.status}).`);
+  }
+  if (!user.email || txn.customer?.email?.toLowerCase() !== user.email.toLowerCase()) {
+    throw new Error("Payment was made by a different email than this account.");
+  }
+
+  await markOrderPaid(orderId, "PAYSTACK", txn.reference);
+
+  if (user.email) {
+    await sendEmail({
+      to: user.email,
+      subject: `Payment received for order #${order.id.slice(-8)}`,
+      html: `<p>Hi ${escapeHtml(user.name ?? "there")},</p><p>Your Paystack payment of ${escapeHtml((txn.amount / 100).toFixed(2))} ${escapeHtml(txn.currency)} has been received. Your expert will be notified and start work shortly.</p>`,
+    });
+  }
+
+  revalidatePath(`/dashboard/orders/${orderId}`);
+  return { success: true, status: txn.status };
+}
+
 export async function completePayPalPayment(orderId: string, paypalOrderId: string) {
   const user = await requireUser();
   const order = await getOrderForClient(orderId, user.id);
@@ -124,7 +204,7 @@ export async function completePayPalPayment(orderId: string, paypalOrderId: stri
 
 export async function markOrderPaid(
   orderId: string,
-  gateway: "STRIPE" | "PAYPAL",
+  gateway: "STRIPE" | "PAYPAL" | "PAYSTACK",
   gatewayRef: string
 ) {
   const order = await prisma.order.findUnique({ where: { id: orderId } });
@@ -217,6 +297,23 @@ export async function refundOrder(orderId: string, amount?: number) {
     return { success: true, refundId: result.id };
   }
 
+  if (payment.gateway === "PAYSTACK") {
+    if (!payment.gatewayRef) throw new Error("No Paystack reference found on payment");
+    const result = await refundTransaction({
+      transactionReference: payment.gatewayRef,
+      amount,
+    });
+    await prisma.payment.update({
+      where: { id: payment.id },
+      data: { status: "REFUNDED" },
+    });
+    await prisma.order.update({
+      where: { id: orderId },
+      data: { status: "CANCELLED" },
+    });
+    return { success: true, refundId: result.id };
+  }
+
   throw new Error("Refund for this gateway must be processed manually");
 }
 
@@ -242,4 +339,21 @@ function escapeHtml(input: string) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+/**
+ * Human-readable gateway label for display (e.g. "Stripe", "PayPal",
+ * "Paystack"). Use this in any UI that renders a `Payment.gateway` value.
+ */
+export async function formatGateway(gateway: string): Promise<string> {
+  switch (gateway.toUpperCase()) {
+    case "STRIPE":
+      return "Stripe";
+    case "PAYPAL":
+      return "PayPal";
+    case "PAYSTACK":
+      return "Paystack";
+    default:
+      return gateway;
+  }
 }

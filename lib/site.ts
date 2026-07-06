@@ -9,21 +9,26 @@ export const siteConfig = {
   email: "info@assistbridge.online",
   supportEmail: "support@assistbridge.online",
   ownerEmail: "patywafula2019@gmail.com",
-  phone: "",
+  phone: "+254115253169",
+  whatsapp: "+254115253169",
   address: "",
   social: {
     twitter: "https://twitter.com/assistbridge",
     linkedin: "https://www.linkedin.com/company/assistbridge",
     github: "",
+    facebook: "https://facebook.com/assistbridge",
+    instagram: "https://instagram.com/assistbridge",
+    youtube: "https://youtube.com/@assistbridge",
   },
   nav: {
     main: [
       { label: "Services", href: "/services" },
-      { label: "Disciplines", href: "/disciplines" },
+      { label: "Portfolio", href: "/portfolio" },
       { label: "How It Works", href: "/how-it-works" },
       { label: "Experts", href: "/experts" },
       { label: "Pricing", href: "/pricing" },
       { label: "Blog", href: "/blog" },
+      { label: "Contact", href: "/contact" },
       { label: "Become an Expert", href: "/become-an-expert" },
     ],
     footer: [
