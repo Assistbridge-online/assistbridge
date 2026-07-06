@@ -66,8 +66,10 @@ function opacityClass(volume: number): string {
 
 export function TrendingTopics() {
   return (
-    <section className="bg-slate-50 border-y border-slate-200">
-      <div className="container-x py-16 md:py-20">
+    <section className="relative overflow-hidden bg-gradient-to-b from-sky-50/50 via-slate-50 to-violet-50/30 border-y border-slate-200">
+      <div className="absolute -top-20 -left-20 h-64 w-64 rounded-full bg-sky-200/40 blur-3xl" aria-hidden="true" />
+      <div className="absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-violet-200/40 blur-3xl" aria-hidden="true" />
+      <div className="relative container-x py-16 md:py-20">
         <div className="max-w-2xl mx-auto text-center">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">
             Trending on the web

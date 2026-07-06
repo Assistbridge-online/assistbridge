@@ -299,52 +299,54 @@ export default function HowItWorksPage() {
       {/* ===================== CTA ===================== */}
       <section>
         <div className="container-x py-16">
-          <div className="relative overflow-hidden rounded-3xl bg-slate-900 p-8 md:p-12 text-white">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-700 via-indigo-800 to-slate-900 p-8 md:p-12 text-white">
             <div className="absolute inset-0 opacity-30 [background-image:radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.1)_1px,transparent_0)] [background-size:24px_24px]" />
+            <div className="absolute -top-32 -right-20 h-80 w-80 rounded-full bg-amber-400/20 blur-3xl" />
+            <div className="absolute -bottom-32 -left-20 h-80 w-80 rounded-full bg-sky-400/20 blur-3xl" />
             <div className="relative grid md:grid-cols-[1.4fr_1fr] gap-8 items-center">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Try it yourself</p>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-violet-200">Try it yourself</p>
                 <h2 className="mt-3 text-3xl md:text-4xl lg:text-5xl font-bold leading-[1.1] tracking-tight">
                   Ready to see how it works for you?
                 </h2>
-                <p className="mt-4 text-base text-slate-300 max-w-xl leading-relaxed">
+                <p className="mt-4 text-base text-violet-50/90 max-w-xl leading-relaxed">
                   Post your first project in under five minutes. No credit card required, no commitment.
                   Just describe what you need and we will take it from there.
                 </p>
                 <div className="mt-7 flex flex-wrap gap-3">
                   <Link
                     href="/calculator"
-                    className="group inline-flex items-center gap-2 h-12 px-6 rounded-lg bg-white text-slate-900 text-[15px] font-semibold hover:bg-slate-100 transition-colors"
+                    className="group inline-flex items-center gap-2 h-12 px-6 rounded-lg bg-white text-violet-900 text-[15px] font-semibold hover:bg-violet-50 transition-colors"
                   >
                     Post a project <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                   <Link
                     href="/experts"
-                    className="inline-flex items-center gap-2 h-12 px-6 rounded-lg border border-white/20 text-white text-[15px] font-semibold hover:bg-white/10 transition-colors"
+                    className="inline-flex items-center gap-2 h-12 px-6 rounded-lg border border-white/30 text-white text-[15px] font-semibold hover:bg-white/10 transition-colors"
                   >
                     Browse experts
                   </Link>
                 </div>
               </div>
               <div className="hidden md:block">
-                <div className="rounded-2xl bg-white/5 ring-1 ring-white/10 p-6">
-                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">The path</p>
+                <div className="rounded-2xl bg-white/10 ring-1 ring-white/20 p-6">
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-violet-200">The path</p>
                   <ol className="mt-4 space-y-3">
                     {steps.slice(0, 3).map((s) => {
                       const Icon = s.icon;
                       return (
                         <li key={s.n} className="flex items-start gap-3">
-                          <div className="h-8 w-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
+                          <div className="h-8 w-8 rounded-lg bg-white/15 flex items-center justify-center shrink-0">
                             <Icon className="h-4 w-4" />
                           </div>
                           <div>
                             <div className="text-sm font-bold leading-tight">{s.title}</div>
-                            <div className="text-xs text-slate-400 mt-0.5">{s.duration}</div>
+                            <div className="text-xs text-violet-200 mt-0.5">{s.duration}</div>
                           </div>
                         </li>
                       );
                     })}
-                    <li className="text-sm text-slate-300 pl-11">... and 2 more</li>
+                    <li className="text-sm text-violet-100 pl-11">... and 2 more</li>
                   </ol>
                 </div>
               </div>

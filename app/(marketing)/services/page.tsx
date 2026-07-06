@@ -350,22 +350,25 @@ export default async function ServicesPage() {
       </section>
 
       {/* ===================== PROMISES (what's included) ===================== */}
-      <section className="bg-slate-900 text-white">
-        <div className="container-x py-16 md:py-20">
+      <section className="relative overflow-hidden bg-gradient-to-br from-indigo-950 via-slate-900 to-violet-950 text-white">
+        <div className="absolute inset-0 opacity-40 [background-image:radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.08)_1px,transparent_0)] [background-size:24px_24px]" />
+        <div className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-sky-500/20 blur-3xl" />
+        <div className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-violet-500/20 blur-3xl" />
+        <div className="relative container-x py-16 md:py-20">
           <div className="grid lg:grid-cols-12 gap-10">
             <div className="lg:col-span-4">
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">What's included</p>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-sky-200">What's included</p>
               <h2 className="mt-3 text-3xl md:text-4xl lg:text-5xl font-bold leading-[1.1] tracking-tight">
                 Platform promises on every project.
               </h2>
-              <p className="mt-4 text-base text-slate-300 leading-relaxed">
+              <p className="mt-4 text-base text-slate-200 leading-relaxed">
                 You do not pay extra for the platform features that make expert work safe and
                 reliable. These are included on every project, at every academic level.
               </p>
               <div className="mt-7 flex flex-wrap gap-3">
                 <Link
                   href="/calculator"
-                  className="group inline-flex items-center gap-2 h-12 px-6 rounded-lg bg-white text-slate-900 text-[15px] font-semibold hover:bg-slate-100 transition-colors"
+                  className="group inline-flex items-center gap-2 h-12 px-6 rounded-lg bg-white text-slate-900 text-[15px] font-semibold hover:bg-sky-50 transition-colors"
                 >
                   Post a project <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>
@@ -377,11 +380,11 @@ export default async function ServicesPage() {
                 const Icon = p.icon;
                 return (
                   <li key={p.title} className="rounded-2xl border border-white/10 bg-white/5 p-6 hover:bg-white/10 transition-colors">
-                    <div className="h-10 w-10 rounded-lg bg-white text-slate-900 flex items-center justify-center">
+                    <div className="h-10 w-10 rounded-lg bg-white text-indigo-700 flex items-center justify-center">
                       <Icon className="h-5 w-5" />
                     </div>
                     <h3 className="mt-4 text-base font-bold tracking-tight">{p.title}</h3>
-                    <p className="mt-2 text-sm text-slate-300 leading-relaxed">{p.text}</p>
+                    <p className="mt-2 text-sm text-slate-200 leading-relaxed">{p.text}</p>
                   </li>
                 );
               })}
@@ -416,28 +419,30 @@ export default async function ServicesPage() {
       {/* ===================== CTA ===================== */}
       <section>
         <div className="container-x py-16">
-          <div className="relative overflow-hidden rounded-3xl bg-slate-900 p-8 md:p-12 text-white">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-700 via-indigo-800 to-violet-900 p-8 md:p-12 text-white">
             <div className="absolute inset-0 opacity-30 [background-image:radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.1)_1px,transparent_0)] [background-size:24px_24px]" />
+            <div className="absolute -top-32 -right-20 h-80 w-80 rounded-full bg-amber-400/20 blur-3xl" />
+            <div className="absolute -bottom-32 -left-20 h-80 w-80 rounded-full bg-rose-400/20 blur-3xl" />
             <div className="relative grid md:grid-cols-[1.4fr_1fr] gap-8 items-center">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Request a service</p>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-sky-200">Request a service</p>
                 <h2 className="mt-3 text-3xl md:text-4xl lg:text-5xl font-bold leading-[1.1] tracking-tight">
                   Can not find what you need?
                 </h2>
-                <p className="mt-4 text-base text-slate-300 max-w-xl leading-relaxed">
+                <p className="mt-4 text-base text-sky-50/90 max-w-xl leading-relaxed">
                   Send us a brief describing the work. We will match you with the right expert
                   and give you a transparent quote.
                 </p>
                 <div className="mt-7 flex flex-wrap gap-3">
                   <Link
                     href="/calculator"
-                    className="group inline-flex items-center gap-2 h-12 px-6 rounded-lg bg-white text-slate-900 text-[15px] font-semibold hover:bg-slate-100 transition-colors"
+                    className="group inline-flex items-center gap-2 h-12 px-6 rounded-lg bg-white text-indigo-900 text-[15px] font-semibold hover:bg-sky-50 transition-colors"
                   >
                     Post a project <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                   <Link
                     href="/contact"
-                    className="inline-flex items-center gap-2 h-12 px-6 rounded-lg border border-white/20 text-white text-[15px] font-semibold hover:bg-white/10 transition-colors"
+                    className="inline-flex items-center gap-2 h-12 px-6 rounded-lg border border-white/30 text-white text-[15px] font-semibold hover:bg-white/10 transition-colors"
                   >
                     Have a question?
                   </Link>
@@ -445,7 +450,7 @@ export default async function ServicesPage() {
               </div>
               <div className="hidden md:flex items-center justify-center">
                 <div className="text-center">
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/10 mb-4">
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/15 border border-white/20 mb-4">
                     <Zap className="h-3.5 w-3.5 text-amber-300" />
                     <span className="text-xs font-bold uppercase tracking-wider">Fast turnaround</span>
                   </div>
@@ -455,9 +460,9 @@ export default async function ServicesPage() {
                       { v: "24h", l: "First draft" },
                       { v: "14d", l: "Revisions" },
                     ].map((s) => (
-                      <div key={s.l} className="rounded-xl bg-white/5 ring-1 ring-white/10 p-4">
+                      <div key={s.l} className="rounded-xl bg-white/10 ring-1 ring-white/20 p-4">
                         <div className="text-2xl font-bold tabular-nums">{s.v}</div>
-                        <div className="mt-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">{s.l}</div>
+                        <div className="mt-1 text-[10px] font-bold uppercase tracking-wider text-sky-100">{s.l}</div>
                       </div>
                     ))}
                   </div>

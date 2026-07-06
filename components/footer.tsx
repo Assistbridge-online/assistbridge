@@ -37,7 +37,9 @@ const paymentMethods: Array<
 
 export function Footer() {
   return (
-    <footer className="mt-24 bg-slate-900 text-slate-300">
+    <footer className="mt-24 relative bg-slate-900 text-slate-300">
+      {/* Colored top accent strip */}
+      <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-sky-500 via-violet-500 to-amber-500" aria-hidden="true" />
       {/* Main footer */}
       <div className="container-x pt-16 pb-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-x-8 gap-y-12">

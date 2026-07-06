@@ -597,18 +597,18 @@ export default async function HomePage() {
       {/* ===================== CTA ===================== */}
       <section>
         <div className="container-x py-16">
-          <div className="relative overflow-hidden rounded-3xl bg-slate-900 p-8 md:p-12 text-white">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-900 to-violet-900 p-8 md:p-12 text-white">
             <div className="absolute inset-0 opacity-30 [background-image:radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.1)_1px,transparent_0)] [background-size:24px_24px]" />
-            <div className="absolute -top-32 -right-20 h-80 w-80 rounded-full bg-emerald-500/20 blur-3xl" />
-            <div className="absolute -bottom-32 -left-20 h-80 w-80 rounded-full bg-primary-500/20 blur-3xl" />
+            <div className="absolute -top-32 -right-20 h-80 w-80 rounded-full bg-amber-400/20 blur-3xl" />
+            <div className="absolute -bottom-32 -left-20 h-80 w-80 rounded-full bg-sky-400/20 blur-3xl" />
 
             <div className="relative grid md:grid-cols-[1.4fr_1fr] gap-8 items-center">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-300">Get started</p>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-200">Get started</p>
                 <h2 className="mt-3 text-3xl md:text-4xl lg:text-5xl font-bold leading-[1.1] tracking-tight">
                   Ready when you are. No commitment, no card.
                 </h2>
-                <p className="mt-4 text-base text-slate-300 max-w-xl leading-relaxed">
+                <p className="mt-4 text-base text-slate-200 max-w-xl leading-relaxed">
                   Post your first project in under five minutes. Get matched with a vetted
                   expert, pay securely through Stripe or Paystack, and release payment only when the
                   work is done.
@@ -616,19 +616,19 @@ export default async function HomePage() {
                 <div className="mt-7 flex flex-wrap gap-3">
                   <Link
                     href="/calculator"
-                    className="group inline-flex items-center gap-2 h-12 px-6 rounded-lg bg-white text-slate-900 text-[15px] font-semibold hover:bg-emerald-50 transition-colors"
+                    className="group inline-flex items-center gap-2 h-12 px-6 rounded-lg bg-white text-slate-900 text-[15px] font-semibold hover:bg-amber-50 transition-colors"
                   >
                     Post your first project <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                   <Link
                     href="/pricing"
-                    className="inline-flex items-center gap-2 h-12 px-6 rounded-lg border border-white/20 text-white text-[15px] font-semibold hover:bg-white/10 transition-colors"
+                    className="inline-flex items-center gap-2 h-12 px-6 rounded-lg border border-white/30 text-white text-[15px] font-semibold hover:bg-white/10 transition-colors"
                   >
                     See pricing
                   </Link>
                 </div>
               </div>
-              <div className="relative aspect-[4/3] rounded-2xl overflow-hidden ring-1 ring-white/10">
+              <div className="relative aspect-[4/3] rounded-2xl overflow-hidden ring-1 ring-white/15">
                 <Image
                   src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&q=80"
                   alt="Two people working together at a desk"
