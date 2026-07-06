@@ -23,7 +23,6 @@ export const siteConfig = {
   nav: {
     main: [
       { label: "Services", href: "/services" },
-      { label: "Portfolio", href: "/portfolio" },
       { label: "How It Works", href: "/how-it-works" },
       { label: "Experts", href: "/experts" },
       { label: "Pricing", href: "/pricing" },
