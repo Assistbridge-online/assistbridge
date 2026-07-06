@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { NewsletterForm } from "@/components/newsletter-form";
 import { siteConfig } from "@/lib/site";
-import { Mail, MapPin, Phone, CheckCircle, MessageCircle } from "lucide-react";
+import { Mail, MapPin, Phone, CheckCircle } from "lucide-react";
 
 const socialIcons = {
   twitter: (
@@ -82,17 +82,6 @@ export function Footer() {
                   <Phone className="h-4 w-4 shrink-0" />
                   <span>{siteConfig.phone}</span>
                 </span>
-              )}
-              {siteConfig.whatsapp && (
-                <a
-                  href={`https://wa.me/${siteConfig.whatsapp.replace(/[^0-9]/g, "")}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 text-slate-400 hover:text-emerald-400 transition-colors"
-                >
-                  <MessageCircle className="h-4 w-4 shrink-0" />
-                  <span>WhatsApp: {siteConfig.whatsapp}</span>
-                </a>
               )}
               {siteConfig.address && (
                 <span className="flex items-start gap-2.5 text-slate-400">

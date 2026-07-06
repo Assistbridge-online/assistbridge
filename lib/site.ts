@@ -13,10 +13,10 @@ export const siteConfig = {
   whatsapp: "+254115253169",
   address: "",
   social: {
-    twitter: "https://twitter.com/assistbridge",
+    twitter: "https://x.com/BridgeOnli68501",
     linkedin: "https://www.linkedin.com/company/assistbridge",
     github: "",
-    facebook: "https://facebook.com/assistbridge",
+    facebook: "https://www.facebook.com/profile.php?id=61573231394094",
     instagram: "https://instagram.com/assistbridge",
     youtube: "https://youtube.com/@assistbridge",
   },
