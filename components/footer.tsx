@@ -22,11 +22,14 @@ const socialLinks = [
   { href: siteConfig.social.facebook, label: "Facebook", icon: socialIcons.facebook },
 ];
 
-const paymentMethods = [
+const paymentMethods: Array<
+  | { name: string; src: string; h?: string; invert?: boolean }
+  | { name: "Paystack"; inline: "paystack"; h?: string }
+> = [
   { name: "Visa", src: "https://cdn.jsdelivr.net/npm/payment-icons@1.0.0/min/flat/visa.svg" },
   { name: "Mastercard", src: "https://cdn.jsdelivr.net/npm/payment-icons@1.0.0/min/flat/mastercard.svg" },
   { name: "PayPal", src: "https://cdn.jsdelivr.net/npm/payment-icons@1.0.0/min/flat/paypal.svg" },
-  { name: "Paystack", src: "https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/paystack.svg", invert: true, h: "h-5" },
+  { name: "Paystack", inline: "paystack", h: "h-6" },
   { name: "Apple Pay", src: "https://cdn.simpleicons.org/applepay/white" },
   { name: "Google Pay", src: "https://cdn.simpleicons.org/googlepay" },
   { name: "Amex", src: "https://cdn.jsdelivr.net/npm/payment-icons@1.0.0/min/flat/amex.svg" },
@@ -120,17 +123,47 @@ export function Footer() {
                 Secure payments
               </p>
               <div className="flex flex-nowrap items-center gap-3">
-                {paymentMethods.map((pm) => (
-                  <img
-                    key={pm.name}
-                    src={pm.src}
-                    alt={pm.name}
-                    title={pm.name}
-                    className={`${pm.h ?? (pm.name === "PayPal" ? "h-4" : "h-6")} w-auto ${pm.invert ? "invert" : ""}`}
-                    style={{ filter: pm.invert ? "invert(1) brightness(1.5)" : undefined }}
-                    loading="lazy"
-                  />
-                ))}
+                {paymentMethods.map((pm) => {
+                  if ("inline" in pm && pm.inline === "paystack") {
+                    return (
+                      <span
+                        key={pm.name}
+                        title="Paystack"
+                        aria-label="Paystack"
+                        className={`inline-flex items-center ${pm.h ?? "h-6"}`}
+                      >
+                        <svg
+                          viewBox="0 0 120 24"
+                          className="h-full w-auto"
+                          aria-hidden="true"
+                        >
+                          <text
+                            x="0"
+                            y="18"
+                            fontFamily="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+                            fontSize="20"
+                            fontWeight="700"
+                            fill="#FFFFFF"
+                            letterSpacing="-0.5"
+                          >
+                            paystack
+                          </text>
+                        </svg>
+                      </span>
+                    );
+                  }
+                  return (
+                    <img
+                      key={pm.name}
+                      src={pm.src}
+                      alt={pm.name}
+                      title={pm.name}
+                      className={`${pm.h ?? (pm.name === "PayPal" ? "h-4" : "h-6")} w-auto ${pm.invert ? "invert" : ""}`}
+                      style={{ filter: pm.invert ? "invert(1) brightness(1.5)" : undefined }}
+                      loading="lazy"
+                    />
+                  );
+                })}
               </div>
             </div>
 
