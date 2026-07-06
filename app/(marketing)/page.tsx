@@ -63,52 +63,47 @@ export default async function HomePage() {
     {
       n: "01",
       icon: FileCheck,
-      iconBg: "bg-emerald-100 text-emerald-700",
       t: "Post your project",
+      short: "Tell us what you need.",
       d: "Describe what you need, the deadline, your budget, and any reference files. The more context, the better the match.",
       points: ["Structured brief form", "Attach reference files", "Set deadline and budget"],
-      img: "https://images.unsplash.com/photo-1517842645767-c639042777db?w=900&q=80",
-      alt: "Open notebook with a pen and a coffee cup on a wooden desk",
+      duration: "~5 min",
     },
     {
       n: "02",
       icon: Search,
-      iconBg: "bg-amber-100 text-amber-700",
       t: "Get matched with a vetted expert",
+      short: "We hand-pick 1-3 experts.",
       d: "Within hours, you receive quotes from pre-vetted experts. Compare profiles, ratings, and pricing, then pick the one you trust.",
-      points: ["1–3 expert proposals", "Transparent fixed pricing", "Ratings and sample work visible"],
-      img: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=900&q=80",
-      alt: "Two professionals reviewing project details on a tablet",
+      points: ["1-3 expert proposals", "Transparent fixed pricing", "Ratings and sample work visible"],
+      duration: "Within 4 hours",
     },
     {
       n: "03",
       icon: CreditCard,
-      iconBg: "bg-sky-100 text-sky-700",
       t: "Pay securely and start",
-d: "Once you approve the quote, you pay through Stripe or Paystack. Your expert is notified and starts work immediately. We never see your card details.",
+      short: "Funds held in escrow.",
+      d: "Once you approve the quote, you pay through Stripe or Paystack. Your expert is notified and starts work immediately. We never see your card details.",
       points: ["Pay via Stripe or Paystack", "Payment held until approval", "Expert starts work"],
-      img: "https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?w=900&q=80",
-      alt: "Hand holding a credit card over a secure online checkout form",
+      duration: "~2 min",
     },
     {
       n: "04",
       icon: MessageSquare,
-      iconBg: "bg-violet-100 text-violet-700",
       t: "Collaborate and track progress",
+      short: "Stay in the loop.",
       d: "Message your expert, share files, get draft deliveries, and request revisions. You see progress updates in your dashboard so you always know where things stand.",
       points: ["Message in-platform", "Share files securely", "Get progress updates"],
-      img: "https://images.unsplash.com/photo-1556761175-4b46a572b786?w=900&q=80",
-      alt: "Laptop screen showing a project dashboard with charts and progress tracking",
+      duration: "Ongoing",
     },
     {
       n: "05",
       icon: CheckCircle2,
-      iconBg: "bg-rose-100 text-rose-700",
       t: "Approve and release payment",
+      short: "Pay when you are happy.",
       d: "When you are happy with the work, approve the final delivery. Payment releases to your expert. You have 14 days to request revisions if anything needs tweaking.",
       points: ["Review final delivery", "Release payment", "14 days for revisions"],
-      img: "https://images.unsplash.com/photo-1606326608690-4e0281b1e588?w=900&q=80",
-      alt: "Hands signing and stamping a finished document on a desk",
+      duration: "1 click",
     },
   ];
 
@@ -219,76 +214,79 @@ d: "Once you approve the quote, you pay through Stripe or Paystack. Your expert 
         </div>
       </section>
 
-      {/* ===================== HOW IT WORKS (magazine alternating) ===================== */}
-      <section className="bg-slate-50 border-b border-slate-200">
-        <div className="container-x py-20 md:py-28">
-          <div className="max-w-3xl">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">How it works</p>
-            <h2 className="mt-3 text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 leading-[1.1]">
-              From brief to delivery. In five clear steps.
-            </h2>
-            <p className="mt-4 text-base text-slate-600 leading-relaxed max-w-2xl">
-              We have stripped the friction out of getting expert help. No bidding wars,
-              no opaque pricing, no disappearing freelancers. Just a clear, professional process.
-            </p>
+      {/* ===================== HOW IT WORKS (clean stepper) ===================== */}
+      <section className="bg-white border-b border-slate-200">
+        <div className="container-x py-16 md:py-20">
+          <div className="grid lg:grid-cols-[1.4fr_1fr] gap-10 items-center mb-12">
+            <div className="max-w-2xl">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">How it works</p>
+              <h2 className="mt-3 text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 leading-[1.1]">
+                From brief to delivery.
+                <br />
+                In five clear steps.
+              </h2>
+              <p className="mt-4 text-base text-slate-600 leading-relaxed max-w-xl">
+                We have stripped the friction out of getting expert help. No bidding wars,
+                no opaque pricing, no disappearing freelancers. Just a clear, professional process.
+              </p>
+            </div>
+
+            {/* Quick step summary */}
+            <ol className="grid grid-cols-5 gap-2 lg:gap-3">
+              {steps.map((s) => (
+                <li key={s.n} className="flex flex-col items-center text-center">
+                  <div className="h-10 w-10 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-bold">
+                    {s.n}
+                  </div>
+                  <div className="mt-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                    Step {s.n}
+                  </div>
+                  <div className="mt-1 text-xs font-bold text-slate-900 leading-tight line-clamp-2">
+                    {s.short}
+                  </div>
+                </li>
+              ))}
+            </ol>
           </div>
 
-          <div className="mt-12 space-y-20">
-            {steps.map((s, i) => {
+          <ol className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {steps.map((s) => {
               const Icon = s.icon;
               return (
-                <div
-                  key={s.n}
-                  className="grid lg:grid-cols-2 gap-10 items-center"
-                >
-                  <div className={`relative ${i % 2 === 1 ? "lg:order-2" : ""}`}>
-                    <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-xl shadow-slate-900/10 ring-1 ring-slate-200/60">
-                      <Image
-                        src={s.img}
-                        alt={s.alt}
-                        fill
-                        sizes="(max-width: 1024px) 100vw, 50vw"
-                        className="object-cover"
-                      />
+                <li key={s.n} className="rounded-2xl border border-slate-200 bg-white p-6 hover:border-slate-900 hover:shadow-md transition-all">
+                  <div className="flex items-start gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shrink-0">
+                      <Icon className="h-5 w-5" />
                     </div>
-                    <div className="absolute -bottom-5 -right-5 lg:-right-6 bg-white rounded-2xl shadow-2xl shadow-slate-900/15 ring-1 ring-slate-200 px-5 py-4 hidden sm:flex items-center gap-3">
-                      <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${s.iconBg}`}>
-                        <Icon className="h-5 w-5" />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Step {s.n}</span>
+                        <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-wider">
+                          {s.duration}
+                        </span>
                       </div>
-                      <div>
-                        <div className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Step {s.n}</div>
-                        <div className="text-sm font-bold text-slate-900 leading-tight">{s.t}</div>
-                      </div>
+                      <h3 className="mt-1.5 text-base font-bold tracking-tight text-slate-900 leading-tight">
+                        {s.t}
+                      </h3>
                     </div>
                   </div>
-                  <div className={i % 2 === 1 ? "lg:order-1" : ""}>
-                    <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-slate-500">
-                      <span className="h-7 w-7 rounded-full bg-slate-900 text-white flex items-center justify-center text-[10px] font-bold">
-                        {s.n}
-                      </span>
-                      Step {s.n}
-                    </div>
-                    <h3 className="mt-4 text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
-                      {s.t}
-                    </h3>
-                    <p className="mt-4 text-base text-slate-600 leading-relaxed">
-                      {s.d}
-                    </p>
-                    <ul className="mt-6 space-y-2.5">
-                      {s.points.map((p) => (
-                        <li key={p} className="flex items-start gap-2.5 text-sm text-slate-700">
-                          <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" strokeWidth={2.5} />
-                          <span>{p}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
+                  <p className="mt-4 text-sm text-slate-600 leading-relaxed">
+                    {s.d}
+                  </p>
+                  <ul className="mt-4 space-y-1.5">
+                    {s.points.map((p) => (
+                      <li key={p} className="flex items-start gap-2 text-xs text-slate-700">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-slate-900 shrink-0 mt-0.5" strokeWidth={2.5} />
+                        <span>{p}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
               );
             })}
-          </div>
+          </ol>
 
-          <div className="mt-14 text-center">
+          <div className="mt-12 text-center">
             <LinkButton href="/how-it-works" size="lg" variant="outline">
               Read the full process <ArrowRight className="h-4 w-4" />
             </LinkButton>
