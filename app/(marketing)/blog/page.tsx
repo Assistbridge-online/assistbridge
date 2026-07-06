@@ -50,7 +50,7 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
 
   return (
     <>
-      <header className="relative overflow-hidden bg-gradient-to-b from-emerald-50/30 via-white to-white border-b border-slate-200/70">
+      <header className="relative overflow-hidden bg-gradient-to-b from-slate-50 via-white to-white border-b border-slate-200/70">
         <div className="absolute inset-0 opacity-50 [background-image:radial-gradient(circle_at_1px_1px,rgba(15,23,42,0.05)_1px,transparent_0)] [background-size:24px_24px]" />
         <div className="container-x relative py-14 md:py-20">
           <div className="max-w-3xl">
@@ -66,13 +66,13 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
 
             <form className="mt-7 flex gap-2 max-w-md" method="get">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-600" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                 <input
                   type="search"
                   name="q"
                   defaultValue={params.q ?? ""}
                   placeholder="Search articles…"
-                  className="h-11 w-full pl-9 pr-3 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-300"
+                  className="h-11 w-full pl-9 pr-3 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900"
                 />
                 {params.category && <input type="hidden" name="category" value={params.category} />}
               </div>
@@ -95,8 +95,8 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
                   className={
                     "inline-flex items-center px-4 h-9 rounded-sm text-sm font-medium transition-colors " +
                     (isActive
-                      ? "bg-emerald-700 text-white"
-                      : "bg-white text-slate-700 border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700")
+                      ? "bg-slate-900 text-white"
+                      : "bg-white text-slate-700 border border-slate-200 hover:border-slate-900 hover:bg-slate-50 hover:text-slate-900")
                   }
                 >
                   {c}
@@ -120,14 +120,14 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
                   <div className="grid lg:grid-cols-1">
                     <div className="p-7 sm:p-10 flex flex-col justify-center">
                       <div className="flex items-center gap-2 text-[11px]">
-                        <span className="px-2.5 py-0.5 rounded-sm bg-emerald-700 text-white font-bold uppercase tracking-wider">
+                        <span className="px-2.5 py-0.5 rounded-sm bg-slate-900 text-white font-bold uppercase tracking-wider">
                           {featured.category}
                         </span>
                         <span className="px-2.5 py-0.5 rounded-sm bg-amber-100 text-amber-800 font-bold uppercase tracking-wider">
                           Featured
                         </span>
                       </div>
-                      <h2 className="mt-4 text-2xl md:text-3xl font-bold tracking-tight text-slate-900 leading-snug group-hover:text-emerald-800 transition-colors">
+                      <h2 className="mt-4 text-2xl md:text-3xl font-bold tracking-tight text-slate-900 leading-snug group-hover:text-slate-700 transition-colors">
                         {featured.title}
                       </h2>
                       <p className="mt-3 text-base text-slate-600 leading-relaxed line-clamp-3">
@@ -151,7 +151,7 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
                           0 Comments
                         </span>
                       </div>
-                      <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold uppercase tracking-wider text-emerald-700 group-hover:gap-2.5 transition-all">
+                      <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold uppercase tracking-wider text-slate-900 group-hover:gap-2.5 transition-all">
                         Read More <ArrowRight className="h-4 w-4" />
                       </span>
                     </div>
@@ -165,13 +165,13 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
                 {rest.map((p) => (
                   <article key={p.id} className="group bg-white">
                       <Link href={`/blog/${p.slug}`} className="block">
-                        <div>
-                          <span className="px-2.5 py-0.5 rounded-sm bg-emerald-700 text-white text-[10px] font-bold uppercase tracking-wider shadow-sm">
-                            {p.category}
-                          </span>
-                          <h3 className="mt-3 text-lg font-bold leading-snug text-slate-900 group-hover:text-emerald-800 transition-colors line-clamp-2">
-                            {p.title}
-                          </h3>
+                    <div>
+                      <span className="px-2.5 py-0.5 rounded-sm bg-slate-900 text-white text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                        {p.category}
+                      </span>
+                      <h3 className="mt-3 text-lg font-bold leading-snug text-slate-900 group-hover:text-slate-700 transition-colors line-clamp-2">
+                        {p.title}
+                      </h3>
                           <p className="mt-3 text-sm text-slate-600 leading-relaxed line-clamp-3">
                             {p.excerpt}
                           </p>
@@ -192,7 +192,7 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
                             </span>
                           </div>
                           <div className="mt-4 pb-6">
-                            <span className="inline-flex items-center gap-1.5 text-sm font-bold uppercase tracking-wider text-emerald-700 group-hover:gap-2.5 transition-all">
+                            <span className="inline-flex items-center gap-1.5 text-sm font-bold uppercase tracking-wider text-slate-900 group-hover:gap-2.5 transition-all">
                               Read More <ArrowRight className="h-3.5 w-3.5" />
                             </span>
                           </div>
@@ -218,8 +218,8 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
           </div>
 
           <aside className="space-y-6">
-            <Card className="p-5 bg-gradient-to-br from-emerald-50/60 via-white to-emerald-50/30 border-emerald-200/60">
-              <p className="text-xs uppercase tracking-wider text-emerald-700 font-semibold">Get expert help</p>
+            <Card className="p-5 bg-gradient-to-br from-slate-50 via-white to-slate-50/40 border-slate-200/60">
+              <p className="text-xs uppercase tracking-wider text-slate-700 font-semibold">Get expert help</p>
               <p className="mt-2 text-sm text-slate-700">
                 Post your project and we&apos;ll match you with a vetted specialist. Pay only when you approve the work.
               </p>
@@ -312,7 +312,7 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
                 </a>
                 <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="h-9 w-9 inline-flex items-center justify-center rounded-md border border-slate-200 text-slate-600 hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-colors text-xs font-bold" aria-label="Twitter">𝕏</a>
                 <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="h-9 w-9 inline-flex items-center justify-center rounded-md border border-slate-200 text-slate-600 hover:bg-blue-700 hover:text-white hover:border-blue-700 transition-colors text-xs font-bold" aria-label="LinkedIn">in</a>
-                <a href="mailto:hello@assistbridge.online" className="h-9 w-9 inline-flex items-center justify-center rounded-md border border-slate-200 text-slate-600 hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-colors" aria-label="Email">
+                <a href="mailto:hello@assistbridge.online" className="h-9 w-9 inline-flex items-center justify-center rounded-md border border-slate-200 text-slate-600 hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-colors" aria-label="Email">
                   <Mail className="h-4 w-4" />
                 </a>
               </div>
@@ -376,7 +376,7 @@ function Pagination({
           "h-9 w-9 inline-flex items-center justify-center rounded-md text-sm font-medium " +
           (isFirst
             ? "bg-white text-slate-300 border border-slate-200 pointer-events-none"
-            : "bg-white text-slate-700 border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700")
+            : "bg-white text-slate-700 border border-slate-200 hover:border-slate-900 hover:bg-slate-50 hover:text-slate-900")
         }
       >
         <ChevronLeft className="h-4 w-4" />
@@ -392,7 +392,7 @@ function Pagination({
             className={
               "h-9 min-w-9 px-3 inline-flex items-center justify-center rounded-md text-sm font-medium " +
               (isCurrent
-                ? "bg-emerald-700 text-white hover:bg-emerald-800"
+                ? "bg-slate-900 text-white hover:bg-slate-800"
                 : "bg-white text-slate-700 border border-slate-200 hover:border-slate-300 hover:bg-slate-50")
             }
           >
@@ -409,7 +409,7 @@ function Pagination({
           "h-9 w-9 inline-flex items-center justify-center rounded-md text-sm font-medium " +
           (isLast
             ? "bg-white text-slate-300 border border-slate-200 pointer-events-none"
-            : "bg-white text-slate-700 border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700")
+            : "bg-white text-slate-700 border border-slate-200 hover:border-slate-900 hover:bg-slate-50 hover:text-slate-900")
         }
       >
         <ChevronRight className="h-4 w-4" />

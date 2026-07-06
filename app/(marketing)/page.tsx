@@ -554,10 +554,10 @@ d: "Once you approve the quote, you pay through Stripe or Paystack. Your expert 
                 <article key={p.id} className="group bg-white">
                   <Link href={`/blog/${p.slug}`} className="block">
                     <div>
-                      <span className="px-2.5 py-0.5 rounded-sm bg-emerald-700 text-white text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                      <span className="px-2.5 py-0.5 rounded-sm bg-slate-900 text-white text-[10px] font-bold uppercase tracking-wider shadow-sm">
                         {p.category}
                       </span>
-                      <h3 className="mt-3 text-lg font-bold leading-snug text-slate-900 group-hover:text-emerald-800 transition-colors line-clamp-2">
+                      <h3 className="mt-3 text-lg font-bold leading-snug text-slate-900 group-hover:text-slate-700 transition-colors line-clamp-2">
                         {p.title}
                       </h3>
                       <p className="mt-3 text-sm text-slate-600 leading-relaxed line-clamp-3">
@@ -580,7 +580,7 @@ d: "Once you approve the quote, you pay through Stripe or Paystack. Your expert 
                         </span>
                       </div>
                       <div className="mt-4 pb-6">
-                        <span className="inline-flex items-center gap-1.5 text-sm font-bold uppercase tracking-wider text-emerald-700 group-hover:gap-2.5 transition-all">
+                        <span className="inline-flex items-center gap-1.5 text-sm font-bold uppercase tracking-wider text-slate-900 group-hover:gap-2.5 transition-all">
                           Continue Reading <ArrowRight className="h-3.5 w-3.5" />
                         </span>
                       </div>

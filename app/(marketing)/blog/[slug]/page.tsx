@@ -67,7 +67,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
 
   return (
     <article>
-      <header className="relative overflow-hidden bg-gradient-to-b from-emerald-50/30 via-white to-white border-b border-slate-200/70">
+      <header className="relative overflow-hidden bg-gradient-to-b from-slate-50 via-white to-white border-b border-slate-200/70">
         <div className="absolute inset-0 opacity-50 [background-image:radial-gradient(circle_at_1px_1px,rgba(15,23,42,0.04)_1px,transparent_0)] [background-size:24px_24px]" />
         <div className="container-x relative pt-10 pb-10">
           <Link
@@ -80,7 +80,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
           <div className="mt-6 max-w-3xl">
             <Link
               href={`/blog?category=${encodeURIComponent(post.category)}`}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 uppercase tracking-wider hover:text-emerald-900"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 uppercase tracking-wider hover:text-slate-900"
             >
               <Tag className="h-3 w-3" /> {post.category}
             </Link>
@@ -93,7 +93,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
             <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-600">
               <span className="inline-flex items-center gap-1.5">
                 <span className="font-semibold text-slate-900">Posted by</span>
-                <Link href="#author-bio" className="inline-flex items-center gap-1.5 text-emerald-700 font-semibold hover:text-emerald-900">
+                <Link href="#author-bio" className="inline-flex items-center gap-1.5 text-slate-900 font-semibold underline-offset-4 hover:underline">
                   <User className="h-3.5 w-3.5" />
                   AssistBridge Editorial
                 </Link>
@@ -106,7 +106,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
               <span className="text-slate-300">/</span>
               <Link
                 href={`/blog?category=${encodeURIComponent(post.category)}`}
-                className="inline-flex items-center gap-1.5 text-emerald-700 font-semibold hover:text-emerald-900"
+                className="inline-flex items-center gap-1.5 text-slate-700 font-semibold hover:text-slate-900"
               >
                 <Tag className="h-3.5 w-3.5" />
                 {post.category}
@@ -125,8 +125,8 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
         <div className="grid lg:grid-cols-[1fr_240px] gap-10">
           <div className="max-w-2xl">
             {headings.length > 0 && (
-              <div className="mb-8 p-5 rounded-2xl border border-emerald-200/60 bg-gradient-to-br from-emerald-50/30 to-white">
-                <p className="text-xs font-bold uppercase tracking-wider text-emerald-700 mb-2">
+              <div className="mb-8 p-5 rounded-2xl border border-slate-200 bg-slate-50/40">
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
                   In this article
                 </p>
                 <ul className="space-y-1.5 text-sm">
@@ -178,7 +178,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                 <div className="flex flex-wrap gap-1.5">
                   <Link
                     href={`/blog?category=${encodeURIComponent(post.category)}`}
-                    className="inline-flex items-center px-3 py-1 rounded-sm bg-emerald-50 text-emerald-800 text-xs font-semibold hover:bg-emerald-100 border border-emerald-100"
+                    className="inline-flex items-center px-3 py-1 rounded-sm bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800"
                   >
                     {post.category}
                   </Link>
@@ -210,15 +210,15 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
 
             {/* Author Bio */}
             <div id="author-bio" className="mt-10 p-6 md:p-8 rounded-2xl border border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row gap-5 items-start">
-              <div className="h-16 w-16 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 text-white flex items-center justify-center shrink-0 text-2xl font-bold">
+              <div className="h-16 w-16 rounded-full bg-slate-900 text-white flex items-center justify-center shrink-0 text-2xl font-bold">
                 AB
               </div>
               <div className="flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <Link href="#" className="text-lg font-bold text-slate-900 hover:text-emerald-700">
+                  <Link href="#" className="text-lg font-bold text-slate-900 hover:text-slate-700">
                     AssistBridge Editorial
                   </Link>
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase tracking-wider">
+                  <span className="px-2 py-0.5 rounded-full bg-slate-900 text-white text-[10px] font-bold uppercase tracking-wider">
                     Verified Author
                   </span>
                 </div>
@@ -252,7 +252,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                   </Link>
                   <Link
                     href={`mailto:${siteConfig.email}`}
-                    className="h-8 w-8 inline-flex items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-colors"
+                    className="h-8 w-8 inline-flex items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-colors"
                     aria-label="Email"
                   >
                     <Reply className="h-3.5 w-3.5" />
@@ -267,12 +267,12 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                 {prevPost ? (
                   <Link
                     href={`/blog/${prevPost.slug}`}
-                    className="group p-5 rounded-2xl border border-slate-200 bg-white hover:border-emerald-300 hover:shadow-md transition-all"
+                    className="group p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-900 hover:shadow-md transition-all"
                   >
                     <div className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 inline-flex items-center gap-1.5">
                       <ArrowLeft className="h-3.5 w-3.5" /> Previous Post
                     </div>
-                    <h4 className="mt-2 text-base font-bold text-slate-900 leading-snug group-hover:text-emerald-700 line-clamp-2">
+                    <h4 className="mt-2 text-base font-bold text-slate-900 leading-snug group-hover:text-slate-700 line-clamp-2">
                       {prevPost.title}
                     </h4>
                   </Link>
@@ -282,12 +282,12 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                 {nextPost ? (
                   <Link
                     href={`/blog/${nextPost.slug}`}
-                    className="group p-5 rounded-2xl border border-slate-200 bg-white hover:border-emerald-300 hover:shadow-md transition-all text-right"
+                    className="group p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-900 hover:shadow-md transition-all text-right"
                   >
                     <div className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 inline-flex items-center gap-1.5">
                       Next Post <ArrowRight className="h-3.5 w-3.5" />
                     </div>
-                    <h4 className="mt-2 text-base font-bold text-slate-900 leading-snug group-hover:text-emerald-700 line-clamp-2">
+                    <h4 className="mt-2 text-base font-bold text-slate-900 leading-snug group-hover:text-slate-700 line-clamp-2">
                       {nextPost.title}
                     </h4>
                   </Link>
@@ -300,7 +300,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
             {/* Comments / Leave a Reply */}
             <div id="comments" className="mt-12">
               <h3 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-                <MessageSquare className="h-6 w-6 text-emerald-600" />
+                <MessageSquare className="h-6 w-6 text-slate-700" />
                 Leave a Reply
               </h3>
               <p className="mt-2 text-sm text-slate-600">
@@ -316,7 +316,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                   <textarea
                     rows={5}
                     placeholder="Share your thoughts…"
-                    className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-300"
+                    className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900"
                   />
                 </div>
                 <div className="grid sm:grid-cols-3 gap-4">
@@ -327,7 +327,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                     <input
                       type="text"
                       placeholder="Your name"
-                      className="w-full h-10 px-3 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-300"
+                      className="w-full h-10 px-3 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900"
                     />
                   </div>
                   <div>
@@ -337,7 +337,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                     <input
                       type="email"
                       placeholder="you@example.com"
-                      className="w-full h-10 px-3 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-300"
+                      className="w-full h-10 px-3 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900"
                     />
                   </div>
                   <div>
@@ -345,13 +345,13 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                     <input
                       type="url"
                       placeholder="https://"
-                      className="w-full h-10 px-3 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-300"
+                      className="w-full h-10 px-3 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900"
                     />
                   </div>
                 </div>
                 <div>
                   <label className="inline-flex items-center gap-2 text-sm text-slate-700">
-                    <input type="checkbox" className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />
+                    <input type="checkbox" className="rounded border-slate-300 text-slate-900 focus:ring-slate-900" />
                     Save my name and email in this browser for the next time I comment.
                   </label>
                 </div>
@@ -363,7 +363,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
               <div className="mt-8 p-5 rounded-2xl border border-dashed border-slate-300 bg-slate-50/50 text-sm text-slate-600">
                 <p>
                   <strong>Want a private reply?</strong>{" "}
-                  <Link href="/contact" className="text-emerald-700 font-semibold hover:underline">
+                  <Link href="/contact" className="text-slate-900 font-semibold hover:underline">
                     Send us a message
                   </Link>{" "}
                   or{" "}
@@ -371,7 +371,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                     href={`https://wa.me/${siteConfig.whatsapp.replace(/[^0-9]/g, "")}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-emerald-700 font-semibold hover:underline"
+                    className="text-slate-900 font-semibold hover:underline"
                   >
                     chat on WhatsApp
                   </a>
@@ -402,7 +402,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                   Author
                 </p>
                 <div className="mt-3 flex items-center gap-3">
-                  <div className="h-9 w-9 rounded-full bg-gradient-to-br from-primary-500 to-emerald-500 text-white flex items-center justify-center shrink-0">
+                  <div className="h-9 w-9 rounded-full bg-slate-900 text-white flex items-center justify-center shrink-0">
                     <User className="h-4 w-4" />
                   </div>
                   <div>
@@ -511,7 +511,7 @@ function renderInline(text: string): React.ReactNode {
           <a
             key={i}
             href={linkMatch[2]}
-            className="text-emerald-700 underline hover:text-emerald-900"
+            className="text-slate-900 underline underline-offset-2 hover:text-slate-700"
           >
             {linkMatch[1]}
           </a>
