@@ -27,6 +27,7 @@ import {
   getActiveDisciplines,
   getActiveServices,
   getActiveTestimonials,
+  getPublishedPosts,
   getSiteStats,
 } from "@/lib/content";
 import { DisciplineIcon, ServiceIcon, disciplineSlug } from "@/lib/display";
@@ -42,12 +43,14 @@ const statLabels: Record<string, string> = {
 };
 
 export default async function HomePage() {
-  const [disciplines, services, testimonials, stats] = await Promise.all([
+  const [disciplines, services, testimonials, stats, posts] = await Promise.all([
     getActiveDisciplines(),
     getActiveServices(),
     getActiveTestimonials(),
     getSiteStats(),
+    getPublishedPosts(),
   ]);
+  const latestPosts = posts.slice(0, 3);
 
   const steps = [
     {
@@ -115,15 +118,9 @@ d: "Once you approve the quote, you pay through Stripe or Paystack. Your expert 
           <div className="max-w-[1440px] mx-auto grid lg:grid-cols-[1fr_1.25fr] gap-10 items-stretch">
             <div className="animate-fade-in flex flex-col justify-center h-full lg:pl-10">
               <h1 className="text-[2.5rem] sm:text-5xl lg:text-[3.5rem] xl:text-6xl font-bold tracking-tight text-slate-900 leading-[1.1]">
-                AssistBridge:
-                <span className="block sm:inline">
-                  {" "}the expert
-                </span>
-                <br className="hidden sm:block" />{" "}
-                <span>
-                  you need,{" "}
+                Your Trusted Partner for{" "}
                 <span className="relative inline-block">
-                  <span className="gradient-text">on call.</span>
+                  <span className="gradient-text">Academic, Technical & Digital Solutions</span>
                   <svg
                     viewBox="0 0 200 8"
                     className="absolute -bottom-1 left-0 w-full h-2 text-emerald-500 animate-hero-underline"
@@ -139,13 +136,11 @@ d: "Once you approve the quote, you pay through Stripe or Paystack. Your expert 
                     />
                   </svg>
                 </span>
-                </span>
               </h1>
 
               <p className="mt-6 text-base text-slate-600 leading-relaxed max-w-xl">
-                Send your brief at 9am. Have a qualified specialist working on it by lunch.
-                From a 3-page statistical analysis to a 60-slide investor deck. Pay by the page,
-                keep the work, and release the funds only when you&apos;re happy.
+                We help students, researchers, businesses and professionals with academic support,
+                software development, transcription, web design, online services and technical consulting.
               </p>
 
               <ul className="mt-6 flex flex-col gap-2.5 max-w-md">
@@ -179,7 +174,7 @@ d: "Once you approve the quote, you pay through Stripe or Paystack. Your expert 
                   href="/calculator"
                   className="group inline-flex items-center justify-center gap-2 h-12 px-6 rounded-lg bg-slate-900 text-white text-[15px] font-semibold shadow-sm shadow-slate-900/10 hover:bg-primary-800 hover:shadow-lg hover:shadow-primary-700/30 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2"
                 >
-                  <span>Post a project</span>
+                  <span>Get a Free Quote Today</span>
                   <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
                 </Link>
                 <Link
@@ -512,6 +507,85 @@ d: "Once you approve the quote, you pay through Stripe or Paystack. Your expert 
             </div>
             <div className="mt-10">
               <TestimonialCarousel testimonials={testimonials} />
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ===================== LATEST FROM OUR BLOG ===================== */}
+      {latestPosts.length > 0 && (
+        <section>
+          <div className="container-x py-16 md:py-20">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10">
+              <div className="max-w-2xl">
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">From the blog</p>
+                <h2 className="mt-3 text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 leading-[1.1]">
+                  Field notes and expert takes.
+                </h2>
+                <p className="mt-3 text-base text-slate-600 leading-relaxed">
+                  Practical guides, expert interviews, and lessons learned from the work we do every day.
+                </p>
+              </div>
+              <Link
+                href="/blog"
+                className="text-sm font-semibold text-slate-700 hover:text-slate-900 inline-flex items-center gap-1.5 shrink-0"
+              >
+                View all articles <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-7">
+              {latestPosts.map((p) => (
+                <article key={p.id} className="group bg-white">
+                  <Link href={`/blog/${p.slug}`} className="block">
+                    <div className="relative aspect-[16/10] overflow-hidden bg-slate-100 rounded-xl">
+                      {p.image && (
+                        <Image
+                          src={p.image}
+                          alt={p.title}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 33vw"
+                          className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                      )}
+                      <div className="absolute top-3 left-3">
+                        <span className="px-2.5 py-0.5 rounded-sm bg-emerald-700 text-white text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                          {p.category}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="pt-5">
+                      <h3 className="text-lg font-bold leading-snug text-slate-900 group-hover:text-emerald-800 transition-colors line-clamp-2">
+                        {p.title}
+                      </h3>
+                      <p className="mt-3 text-sm text-slate-600 leading-relaxed line-clamp-3">
+                        {p.excerpt}
+                      </p>
+                      <div className="mt-4 pb-5 border-b border-slate-200 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                        <span className="inline-flex items-center gap-1">
+                          <User className="h-3 w-3" />
+                          <span className="text-slate-700 font-medium">AssistBridge</span>
+                        </span>
+                        <span>·</span>
+                        <span className="inline-flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {p.publishedAt ? formatDate(p.publishedAt) : "Draft"}
+                        </span>
+                        <span>·</span>
+                        <span className="inline-flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {p.readTime}
+                        </span>
+                      </div>
+                      <div className="mt-4 pb-6">
+                        <span className="inline-flex items-center gap-1.5 text-sm font-bold uppercase tracking-wider text-emerald-700 group-hover:gap-2.5 transition-all">
+                          Continue Reading <ArrowRight className="h-3.5 w-3.5" />
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                </article>
+              ))}
             </div>
           </div>
         </section>

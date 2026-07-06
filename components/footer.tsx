@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { NewsletterForm } from "@/components/newsletter-form";
 import { siteConfig } from "@/lib/site";
-import { Mail, MapPin, Phone, CheckCircle } from "lucide-react";
+import { Mail, MapPin, Phone, CheckCircle, MessageCircle } from "lucide-react";
 
 const socialIcons = {
   twitter: (
@@ -40,9 +40,9 @@ const socialIcons = {
 const socialLinks = [
   { href: siteConfig.social.twitter, label: "Twitter", icon: socialIcons.twitter },
   { href: siteConfig.social.linkedin, label: "LinkedIn", icon: socialIcons.linkedin },
-  { href: "https://facebook.com/assistbridge", label: "Facebook", icon: socialIcons.facebook },
-  { href: "https://instagram.com/assistbridge", label: "Instagram", icon: socialIcons.instagram },
-  { href: "https://youtube.com/@assistbridge", label: "YouTube", icon: socialIcons.youtube },
+  { href: siteConfig.social.facebook, label: "Facebook", icon: socialIcons.facebook },
+  { href: siteConfig.social.instagram, label: "Instagram", icon: socialIcons.instagram },
+  { href: siteConfig.social.youtube, label: "YouTube", icon: socialIcons.youtube },
 ];
 
 const paymentMethods = [
@@ -83,6 +83,17 @@ export function Footer() {
                   <span>{siteConfig.phone}</span>
                 </span>
               )}
+              {siteConfig.whatsapp && (
+                <a
+                  href={`https://wa.me/${siteConfig.whatsapp.replace(/[^0-9]/g, "")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2.5 text-slate-400 hover:text-emerald-400 transition-colors"
+                >
+                  <MessageCircle className="h-4 w-4 shrink-0" />
+                  <span>WhatsApp: {siteConfig.whatsapp}</span>
+                </a>
+              )}
               {siteConfig.address && (
                 <span className="flex items-start gap-2.5 text-slate-400">
                   <MapPin className="h-4 w-4 shrink-0 mt-0.5" />
@@ -115,7 +126,7 @@ export function Footer() {
             <h4 className="text-xs font-bold text-white uppercase tracking-[0.2em] mb-5">Platform</h4>
             <ul className="space-y-3 text-sm">
               <li><Link className="text-slate-400 hover:text-white transition-colors" href="/services">Services</Link></li>
-              <li><Link className="text-slate-400 hover:text-white transition-colors" href="/disciplines">Disciplines</Link></li>
+              <li><Link className="text-slate-400 hover:text-white transition-colors" href="/portfolio">Portfolio</Link></li>
               <li><Link className="text-slate-400 hover:text-white transition-colors" href="/how-it-works">How It Works</Link></li>
               <li><Link className="text-slate-400 hover:text-white transition-colors" href="/pricing">Pricing</Link></li>
               <li><Link className="text-slate-400 hover:text-white transition-colors" href="/experts">Browse Experts</Link></li>

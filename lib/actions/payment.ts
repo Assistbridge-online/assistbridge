@@ -345,7 +345,7 @@ function escapeHtml(input: string) {
  * Human-readable gateway label for display (e.g. "Stripe", "PayPal",
  * "Paystack"). Use this in any UI that renders a `Payment.gateway` value.
  */
-export function formatGateway(gateway: string): string {
+export async function formatGateway(gateway: string): Promise<string> {
   switch (gateway.toUpperCase()) {
     case "STRIPE":
       return "Stripe";
