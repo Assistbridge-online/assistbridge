@@ -28,7 +28,6 @@ export const siteConfig = {
       { label: "Pricing", href: "/pricing" },
       { label: "Blog", href: "/blog" },
       { label: "Contact", href: "/contact" },
-      { label: "Become an Expert", href: "/become-an-expert" },
     ],
     footer: [
       { label: "About", href: "/about" },
