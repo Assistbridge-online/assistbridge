@@ -117,19 +117,7 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
             {featured && (
               <Link href={`/blog/${featured.slug}`} className="group block mb-10">
                 <Card hover className="overflow-hidden">
-                  <div className="grid lg:grid-cols-2">
-                    <div className="relative aspect-[16/10] lg:aspect-auto bg-slate-100 overflow-hidden">
-                      {featured.image && (
-                        <Image
-                          src={featured.image}
-                          alt={featured.title}
-                          fill
-                          priority
-                          sizes="(max-width: 1024px) 100vw, 50vw"
-                          className="object-cover transition-transform duration-700 group-hover:scale-105"
-                        />
-                      )}
-                    </div>
+                  <div className="grid lg:grid-cols-1">
                     <div className="p-7 sm:p-10 flex flex-col justify-center">
                       <div className="flex items-center gap-2 text-[11px]">
                         <span className="px-2.5 py-0.5 rounded-sm bg-emerald-700 text-white font-bold uppercase tracking-wider">
@@ -177,24 +165,11 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
                 {rest.map((p) => (
                   <article key={p.id} className="group bg-white">
                       <Link href={`/blog/${p.slug}`} className="block">
-                        <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
-                          {p.image && (
-                            <Image
-                              src={p.image}
-                              alt={p.title}
-                              fill
-                              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                              className="object-cover transition-transform duration-700 group-hover:scale-105"
-                            />
-                          )}
-                          <div className="absolute top-3 left-3">
-                            <span className="px-2.5 py-0.5 rounded-sm bg-emerald-700 text-white text-[10px] font-bold uppercase tracking-wider shadow-sm">
-                              {p.category}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="pt-5">
-                          <h3 className="text-lg font-bold leading-snug text-slate-900 group-hover:text-emerald-800 transition-colors line-clamp-2">
+                        <div>
+                          <span className="px-2.5 py-0.5 rounded-sm bg-emerald-700 text-white text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                            {p.category}
+                          </span>
+                          <h3 className="mt-3 text-lg font-bold leading-snug text-slate-900 group-hover:text-emerald-800 transition-colors line-clamp-2">
                             {p.title}
                           </h3>
                           <p className="mt-3 text-sm text-slate-600 leading-relaxed line-clamp-3">
@@ -267,11 +242,6 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
                       href={`/blog/${p.slug}`}
                       className="group flex items-start gap-3"
                     >
-                      <div className="relative h-12 w-12 rounded-md overflow-hidden bg-slate-100 shrink-0">
-                        {p.image && (
-                          <Image src={p.image} alt={p.title} fill sizes="48px" className="object-cover" />
-                        )}
-                      </div>
                       <div className="min-w-0">
                         <h4 className="text-sm font-semibold text-slate-900 leading-snug line-clamp-2 group-hover:text-primary-700">
                           {p.title}

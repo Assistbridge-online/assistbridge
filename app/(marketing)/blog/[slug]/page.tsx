@@ -121,21 +121,6 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
         </div>
       </header>
 
-      {post.image && (
-        <div className="container-x mt-8">
-          <div className="relative aspect-[16/8] sm:aspect-[16/7] rounded-2xl overflow-hidden shadow-xl ring-1 ring-slate-200">
-            <Image
-              src={post.image}
-              alt={post.title}
-              fill
-              priority
-              sizes="(max-width: 1024px) 100vw, 1024px"
-              className="object-cover"
-            />
-          </div>
-        </div>
-      )}
-
       <div className="container-x mt-10">
         <div className="grid lg:grid-cols-[1fr_240px] gap-10">
           <div className="max-w-2xl">
@@ -451,18 +436,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
             <div className="grid md:grid-cols-3 gap-6">
               {relatedPosts.map((p) => (
                 <Link key={p.id} href={`/blog/${p.slug}`} className="group">
-                  <Card hover className="overflow-hidden h-full flex flex-col">
-                    <div className="relative aspect-[16/10] bg-slate-100">
-                      {p.image ? (
-                        <Image
-                          src={p.image}
-                          alt={p.title}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 33vw"
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : null}
-                    </div>
+                  <Card hover className="h-full flex flex-col">
                     <div className="p-5 flex-1 flex flex-col">
                       <span className="text-xs font-bold text-primary-700 uppercase tracking-wider">
                         {p.category}
