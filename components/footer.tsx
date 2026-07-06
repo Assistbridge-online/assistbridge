@@ -26,7 +26,7 @@ const paymentMethods = [
   { name: "Visa", src: "https://cdn.jsdelivr.net/npm/payment-icons@1.0.0/min/flat/visa.svg" },
   { name: "Mastercard", src: "https://cdn.jsdelivr.net/npm/payment-icons@1.0.0/min/flat/mastercard.svg" },
   { name: "PayPal", src: "https://cdn.jsdelivr.net/npm/payment-icons@1.0.0/min/flat/paypal.svg" },
-  { name: "Paystack", src: "https://cdn.brandfetch.io/paystack.com/idP_UAmTZL/w/512/h/106/theme/light/logo.png" },
+  { name: "Paystack", src: "https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/paystack.svg", invert: true, h: "h-5" },
   { name: "Apple Pay", src: "https://cdn.simpleicons.org/applepay/white" },
   { name: "Google Pay", src: "https://cdn.simpleicons.org/googlepay" },
   { name: "Amex", src: "https://cdn.jsdelivr.net/npm/payment-icons@1.0.0/min/flat/amex.svg" },
@@ -126,7 +126,8 @@ export function Footer() {
                     src={pm.src}
                     alt={pm.name}
                     title={pm.name}
-                    className={pm.name === "PayPal" ? "h-4 w-auto" : "h-6 w-auto"}
+                    className={`${pm.h ?? (pm.name === "PayPal" ? "h-4" : "h-6")} w-auto ${pm.invert ? "invert" : ""}`}
+                    style={{ filter: pm.invert ? "invert(1) brightness(1.5)" : undefined }}
                     loading="lazy"
                   />
                 ))}
