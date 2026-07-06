@@ -193,13 +193,13 @@ const AMEX_SVG = (
 );
 
 const paymentMethods: PaymentLogo[] = [
-  { name: "Visa", svg: VISA_SVG, h: "h-5" },
+  { name: "Visa", svg: VISA_SVG, h: "h-7" },
   { name: "Mastercard", svg: MASTERCARD_SVG, h: "h-7" },
-  { name: "PayPal", svg: PAYPAL_SVG, h: "h-5" },
-  { name: "Paystack", svg: PAYSTACK_SVG, h: "h-6" },
-  { name: "Apple Pay", svg: APPLE_PAY_SVG, h: "h-6" },
-  { name: "Google Pay", svg: GOOGLE_PAY_SVG, h: "h-6" },
-  { name: "American Express", svg: AMEX_SVG, h: "h-6" },
+  { name: "PayPal", svg: PAYPAL_SVG, h: "h-7" },
+  { name: "Paystack", svg: PAYSTACK_SVG, h: "h-7" },
+  { name: "Apple Pay", svg: APPLE_PAY_SVG, h: "h-7" },
+  { name: "Google Pay", svg: GOOGLE_PAY_SVG, h: "h-7" },
+  { name: "American Express", svg: AMEX_SVG, h: "h-7" },
 ];
 
 export function Footer() {
@@ -289,13 +289,13 @@ export function Footer() {
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">
                 Secure payments
               </p>
-              <div className="flex flex-nowrap items-center gap-3">
+              <div className="flex flex-nowrap items-center gap-2.5">
                 {paymentMethods.map((pm) => (
                   <span
                     key={pm.name}
                     title={pm.name}
                     aria-label={pm.name}
-                    className={`inline-flex items-center ${pm.h ?? "h-6"}`}
+                    className={`inline-flex items-center justify-center ${pm.h ?? "h-7"}`}
                   >
                     {pm.svg}
                   </span>
