@@ -25,13 +25,15 @@ const socialLinks = [
 const paymentMethods: Array<
   | { name: string; src: string; h?: string; invert?: boolean }
   | { name: "Paystack"; inline: "paystack"; h?: string }
+  | { name: "Apple Pay"; inline: "applepay"; h?: string }
+  | { name: "Google Pay"; inline: "googlepay"; h?: string }
 > = [
   { name: "Visa", src: "https://cdn.jsdelivr.net/npm/payment-icons@1.0.0/min/flat/visa.svg" },
   { name: "Mastercard", src: "https://cdn.jsdelivr.net/npm/payment-icons@1.0.0/min/flat/mastercard.svg" },
   { name: "PayPal", src: "https://cdn.jsdelivr.net/npm/payment-icons@1.0.0/min/flat/paypal.svg" },
   { name: "Paystack", inline: "paystack", h: "h-6" },
-  { name: "Apple Pay", src: "https://cdn.simpleicons.org/applepay/white" },
-  { name: "Google Pay", src: "https://cdn.simpleicons.org/googlepay" },
+  { name: "Apple Pay", inline: "applepay", h: "h-6" },
+  { name: "Google Pay", inline: "googlepay", h: "h-6" },
   { name: "Amex", src: "https://cdn.jsdelivr.net/npm/payment-icons@1.0.0/min/flat/amex.svg" },
 ];
 
@@ -147,6 +149,66 @@ export function Footer() {
                             letterSpacing="-0.5"
                           >
                             paystack
+                          </text>
+                        </svg>
+                      </span>
+                    );
+                  }
+                  if ("inline" in pm && pm.inline === "applepay") {
+                    return (
+                      <span
+                        key={pm.name}
+                        title="Apple Pay"
+                        aria-label="Apple Pay"
+                        className={`inline-flex items-center ${pm.h ?? "h-6"}`}
+                      >
+                        <svg
+                          viewBox="0 0 70 24"
+                          className="h-full w-auto"
+                          aria-hidden="true"
+                        >
+                          <g fill="#FFFFFF">
+                            <path d="M11.45 8.19c.6-.75 1-1.77 1-2.79-.85 0-1.92.55-2.55 1.3-.55.65-1.05 1.72-1 2.74.95.05 1.95-.5 2.55-1.25zM12.5 11.5c-1.4 0-2.6.8-3.4.8s-1.7-.75-2.85-.75c-1.45 0-2.8.85-3.55 2.15-1.5 2.6-.4 6.45 1.1 8.55.7 1.05 1.55 2.2 2.65 2.15 1.05-.05 1.45-.7 2.7-.7 1.25 0 1.6.7 2.7.65 1.1 0 1.8-1.05 2.5-2.1.8-1.2 1.1-2.35 1.15-2.4-.05-.05-2.2-.85-2.2-3.35 0-2.1 1.7-3.1 1.8-3.15-1-1.45-2.55-1.6-3.1-1.65z" />
+                            <text x="20" y="17" fontFamily="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" fontSize="16" fontWeight="500">Pay</text>
+                          </g>
+                        </svg>
+                      </span>
+                    );
+                  }
+                  if ("inline" in pm && pm.inline === "googlepay") {
+                    return (
+                      <span
+                        key={pm.name}
+                        title="Google Pay"
+                        aria-label="Google Pay"
+                        className={`inline-flex items-center ${pm.h ?? "h-6"}`}
+                      >
+                        <svg
+                          viewBox="0 0 70 24"
+                          className="h-full w-auto"
+                          aria-hidden="true"
+                        >
+                          <text
+                            x="0"
+                            y="17"
+                            fontFamily="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+                            fontSize="14"
+                            fontWeight="500"
+                            fill="#FFFFFF"
+                            letterSpacing="-0.3"
+                          >
+                            G
+                          </text>
+                          <text
+                            x="13"
+                            y="17"
+                            fontFamily="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+                            fontSize="14"
+                            fontWeight="500"
+                            fill="#FFFFFF"
+                            letterSpacing="-0.3"
+                          >
+                            Pay
                           </text>
                         </svg>
                       </span>
