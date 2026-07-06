@@ -1,8 +1,0 @@
-⚠ Attempted to load @next/swc-win32-x64-msvc, but an error occurred: \\?\C:\Users\admin\Downloads\NVIDIA\new project\assistbridge\node_modules\@next\swc-win32-x64-msvc\next-swc.win32-x64-msvc.node is not a valid Win32 application.
-\\?\C:\Users\admin\Downloads\NVIDIA\new project\assistbridge\node_modules\@next\swc-win32-x64-msvc\next-swc.win32-x64-msvc.node
-Error: Error: invalid type: unit value, expected usize
-    at ignore-listed frames
-⨯ unhandledRejection: Error: Error: invalid type: unit value, expected usize
-    at ignore-listed frames
-⨯ unhandledRejection:  Error: Error: invalid type: unit value, expected usize
-    at ignore-listed frames
