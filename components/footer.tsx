@@ -22,19 +22,184 @@ const socialLinks = [
   { href: siteConfig.social.facebook, label: "Facebook", icon: socialIcons.facebook },
 ];
 
-const paymentMethods: Array<
-  | { name: string; src: string; h?: string; invert?: boolean }
-  | { name: "Paystack"; inline: "paystack"; h?: string }
-  | { name: "Apple Pay"; inline: "applepay"; h?: string }
-  | { name: "Google Pay"; inline: "googlepay"; h?: string }
-> = [
-  { name: "Visa", src: "https://cdn.jsdelivr.net/npm/payment-icons@1.0.0/min/flat/visa.svg" },
-  { name: "Mastercard", src: "https://cdn.jsdelivr.net/npm/payment-icons@1.0.0/min/flat/mastercard.svg" },
-  { name: "PayPal", src: "https://cdn.jsdelivr.net/npm/payment-icons@1.0.0/min/flat/paypal.svg" },
-  { name: "Paystack", inline: "paystack", h: "h-6" },
-  { name: "Apple Pay", inline: "applepay", h: "h-6" },
-  { name: "Google Pay", inline: "googlepay", h: "h-6" },
-  { name: "Amex", src: "https://cdn.jsdelivr.net/npm/payment-icons@1.0.0/min/flat/amex.svg" },
+/**
+ * Inline payment-method logos. We never load these from a third-party CDN —
+ * icons8 / simpleicons / brandfetch have all proven unreliable in production
+ * (broken images, hotlink blocks, slow loads on the dark footer). Each logo
+ * is rendered as an inline SVG so it ships with the bundle, can't 404, and
+ * inherits `currentColor` where appropriate so it works on any background.
+ */
+
+type PaymentLogo = {
+  name: string;
+  /** Inline SVG node. Sized to fill the wrapping span. */
+  svg: JSX.Element;
+  /** Tailwind height class on the wrapper, e.g. "h-6". */
+  h?: string;
+};
+
+const VISA_SVG = (
+  <svg viewBox="0 0 80 26" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <text
+      x="0"
+      y="21"
+      fontFamily="'Helvetica Neue', Helvetica, Arial, sans-serif"
+      fontSize="26"
+      fontStyle="italic"
+      fontWeight="900"
+      fill="#FFFFFF"
+      letterSpacing="-1"
+    >
+      VISA
+    </text>
+  </svg>
+);
+
+const MASTERCARD_SVG = (
+  <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="14" cy="12" r="8" fill="#EB001B" />
+    <circle cx="24" cy="12" r="8" fill="#F79E1B" />
+    <path
+      d="M19 6.5a8 8 0 0 0 0 11 8 8 0 0 0 0-11z"
+      fill="#FF5F00"
+    />
+  </svg>
+);
+
+const PAYPAL_SVG = (
+  <svg viewBox="0 0 80 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path
+      d="M9.5 4h-5a1 1 0 0 0-1 .85L2 16.5a.6.6 0 0 0 .6.7h2.7a1 1 0 0 0 1-.85l.4-2.55a1 1 0 0 1 1-.85h1.95c4.05 0 6.4-1.95 7-5.85.25-1.7 0-3.05-.85-3.95C14.95 4.6 13.5 4 11.5 4H9.5zm.85 7.4c-.35 2.25-2.05 2.25-3.7 2.25h-.95l.65-4.1a.6.6 0 0 1 .6-.5h.45c1.15 0 2.25 0 2.8.65.35.4.45 1 .15 1.7z"
+      fill="#FFFFFF"
+    />
+    <path
+      d="M29 11.4h-2.7a.6.6 0 0 0-.6.5l-.15.95-.25-.35c-.65-1-2.1-1.25-3.55-1.25-3.3 0-6.15 2.5-6.7 6-.3 1.75.1 3.4 1.1 4.55.9 1.05 2.2 1.5 3.75 1.5 2.65 0 4.1-1.7 4.1-1.7l-.15.95a.6.6 0 0 0 .6.7h2.45a1 1 0 0 0 1-.85l1.45-9.3a.6.6 0 0 0-.6-.7zm-3.85 5.95c-.3 1.65-1.6 2.75-3.25 2.75-.85 0-1.5-.3-1.95-.8-.45-.55-.6-1.25-.45-2.05.3-1.65 1.6-2.8 3.25-2.8.85 0 1.5.3 1.95.85.45.55.6 1.25.45 2.05z"
+      fill="#FFFFFF"
+    />
+    <path
+      d="M42 11.4h-2.75a1 1 0 0 0-.85.45l-3.8 5.6-1.6-5.4a1 1 0 0 0-.95-.7h-2.7a.6.6 0 0 0-.6.75l3.05 8.95-2.85 4.05a.6.6 0 0 0 .5.95h2.7a1 1 0 0 0 .85-.45l9.15-13.2a.6.6 0 0 0-.55-1z"
+      fill="#FFFFFF"
+    />
+    <path
+      d="M52.5 4h-5a1 1 0 0 0-1 .85L45 16.5a.6.6 0 0 0 .6.7h2.55a.7.7 0 0 0 .7-.6l.45-2.8a1 1 0 0 1 1-.85h1.95c4.05 0 6.4-1.95 7-5.85.25-1.7 0-3.05-.85-3.95-.85-.9-2.3-1.5-4.3-1.5h-1.6zm.85 7.4c-.35 2.25-2.05 2.25-3.7 2.25h-.95l.65-4.1a.6.6 0 0 1 .6-.5h.45c1.15 0 2.25 0 2.8.65.35.4.45 1 .15 1.7z"
+      fill="#FFFFFF"
+    />
+  </svg>
+);
+
+const PAYSTACK_SVG = (
+  <svg viewBox="0 0 140 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    {/* Paystack lockup: solid blue square + wordmark, matching the official logo */}
+    <rect x="0" y="2" width="24" height="24" rx="4" fill="#011B33" />
+    <path
+      d="M5 8 L5 20 L9 20 L9 12.5 L13 20 L17 20 L17 8 L13 8 L13 15.5 L9 8 Z"
+      fill="#FFFFFF"
+    />
+    <text
+      x="32"
+      y="20"
+      fontFamily="'Helvetica Neue', Helvetica, Arial, sans-serif"
+      fontSize="20"
+      fontWeight="700"
+      fill="#FFFFFF"
+      letterSpacing="-0.5"
+    >
+      paystack
+    </text>
+  </svg>
+);
+
+const APPLE_PAY_SVG = (
+  <svg viewBox="0 0 70 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path
+      d="M7.4 12.7c0-2.05 1.65-3.05 1.75-3.1-.95-1.4-2.45-1.6-3-1.6-1.25-.15-2.5.75-3.15.75-.65 0-1.65-.7-2.7-.7-1.4 0-2.7.8-3.4 2.05-1.45 2.5-.35 6.2 1.05 8.25.7 1 1.5 2.1 2.55 2.05 1.05-.05 1.4-.65 2.65-.65 1.25 0 1.55.65 2.65.65 1.1 0 1.8-1 2.45-2 .8-1.15 1.1-2.3 1.15-2.35-.05 0-2.2-.85-2.2-3.35zM5.4 6.6c.55-.7.95-1.65.85-2.6-.8.05-1.8.55-2.4 1.2-.5.6-1 1.6-.85 2.55.95.05 1.85-.5 2.4-1.15z"
+      fill="#FFFFFF"
+    />
+    <text
+      x="22"
+      y="17"
+      fontFamily="'Helvetica Neue', Helvetica, Arial, sans-serif"
+      fontSize="14"
+      fontWeight="500"
+      fill="#FFFFFF"
+    >
+      Pay
+    </text>
+  </svg>
+);
+
+const GOOGLE_PAY_SVG = (
+  <svg viewBox="0 0 90 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <text
+      x="22"
+      y="17"
+      fontFamily="'Helvetica Neue', Helvetica, Arial, sans-serif"
+      fontSize="14"
+      fontWeight="500"
+      fill="#FFFFFF"
+    >
+      Pay
+    </text>
+    <path
+      d="M3 9.5 L8.5 9.5 L8.5 14 L3 14 Z"
+      fill="#4285F4"
+    />
+    <path
+      d="M3 14 L8.5 14 L8.5 18.5 L3 18.5 Z"
+      fill="#34A853"
+    />
+    <path
+      d="M3 5 L8.5 5 L8.5 9.5 L3 9.5 Z"
+      fill="#EA4335"
+    />
+    <path
+      d="M8.5 9.5 L14 9.5 L14 14 L8.5 14 Z"
+      fill="#FBBC04"
+    />
+    <path
+      d="M8.5 5 L14 5 L14 9.5 L8.5 9.5 Z M8.5 14 L14 14 L14 18.5 L8.5 18.5 Z"
+      fill="none"
+    />
+    <text
+      x="0"
+      y="22"
+      fontFamily="'Product Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif"
+      fontSize="10"
+      fontWeight="700"
+      fill="#FFFFFF"
+      letterSpacing="0.5"
+    >
+      G
+    </text>
+  </svg>
+);
+
+const AMEX_SVG = (
+  <svg viewBox="0 0 50 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect x="0.5" y="0.5" width="49" height="23" rx="3" fill="#2E77BC" />
+    <text
+      x="25"
+      y="16"
+      textAnchor="middle"
+      fontFamily="'Helvetica Neue', Helvetica, Arial, sans-serif"
+      fontSize="11"
+      fontWeight="800"
+      fill="#FFFFFF"
+      letterSpacing="0.5"
+    >
+      AMEX
+    </text>
+  </svg>
+);
+
+const paymentMethods: PaymentLogo[] = [
+  { name: "Visa", svg: VISA_SVG, h: "h-5" },
+  { name: "Mastercard", svg: MASTERCARD_SVG, h: "h-7" },
+  { name: "PayPal", svg: PAYPAL_SVG, h: "h-5" },
+  { name: "Paystack", svg: PAYSTACK_SVG, h: "h-6" },
+  { name: "Apple Pay", svg: APPLE_PAY_SVG, h: "h-6" },
+  { name: "Google Pay", svg: GOOGLE_PAY_SVG, h: "h-6" },
+  { name: "American Express", svg: AMEX_SVG, h: "h-6" },
 ];
 
 export function Footer() {
@@ -125,107 +290,16 @@ export function Footer() {
                 Secure payments
               </p>
               <div className="flex flex-nowrap items-center gap-3">
-                {paymentMethods.map((pm) => {
-                  if ("inline" in pm && pm.inline === "paystack") {
-                    return (
-                      <span
-                        key={pm.name}
-                        title="Paystack"
-                        aria-label="Paystack"
-                        className={`inline-flex items-center ${pm.h ?? "h-6"}`}
-                      >
-                        <svg
-                          viewBox="0 0 120 24"
-                          className="h-full w-auto"
-                          aria-hidden="true"
-                        >
-                          <text
-                            x="0"
-                            y="18"
-                            fontFamily="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-                            fontSize="20"
-                            fontWeight="700"
-                            fill="#FFFFFF"
-                            letterSpacing="-0.5"
-                          >
-                            paystack
-                          </text>
-                        </svg>
-                      </span>
-                    );
-                  }
-                  if ("inline" in pm && pm.inline === "applepay") {
-                    return (
-                      <span
-                        key={pm.name}
-                        title="Apple Pay"
-                        aria-label="Apple Pay"
-                        className={`inline-flex items-center ${pm.h ?? "h-6"}`}
-                      >
-                        <svg
-                          viewBox="0 0 70 24"
-                          className="h-full w-auto"
-                          aria-hidden="true"
-                        >
-                          <g fill="#FFFFFF">
-                            <path d="M11.45 8.19c.6-.75 1-1.77 1-2.79-.85 0-1.92.55-2.55 1.3-.55.65-1.05 1.72-1 2.74.95.05 1.95-.5 2.55-1.25zM12.5 11.5c-1.4 0-2.6.8-3.4.8s-1.7-.75-2.85-.75c-1.45 0-2.8.85-3.55 2.15-1.5 2.6-.4 6.45 1.1 8.55.7 1.05 1.55 2.2 2.65 2.15 1.05-.05 1.45-.7 2.7-.7 1.25 0 1.6.7 2.7.65 1.1 0 1.8-1.05 2.5-2.1.8-1.2 1.1-2.35 1.15-2.4-.05-.05-2.2-.85-2.2-3.35 0-2.1 1.7-3.1 1.8-3.15-1-1.45-2.55-1.6-3.1-1.65z" />
-                            <text x="20" y="17" fontFamily="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" fontSize="16" fontWeight="500">Pay</text>
-                          </g>
-                        </svg>
-                      </span>
-                    );
-                  }
-                  if ("inline" in pm && pm.inline === "googlepay") {
-                    return (
-                      <span
-                        key={pm.name}
-                        title="Google Pay"
-                        aria-label="Google Pay"
-                        className={`inline-flex items-center ${pm.h ?? "h-6"}`}
-                      >
-                        <svg
-                          viewBox="0 0 70 24"
-                          className="h-full w-auto"
-                          aria-hidden="true"
-                        >
-                          <text
-                            x="0"
-                            y="17"
-                            fontFamily="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-                            fontSize="14"
-                            fontWeight="500"
-                            fill="#FFFFFF"
-                            letterSpacing="-0.3"
-                          >
-                            G
-                          </text>
-                          <text
-                            x="13"
-                            y="17"
-                            fontFamily="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-                            fontSize="14"
-                            fontWeight="500"
-                            fill="#FFFFFF"
-                            letterSpacing="-0.3"
-                          >
-                            Pay
-                          </text>
-                        </svg>
-                      </span>
-                    );
-                  }
-                  return (
-                    <img
-                      key={pm.name}
-                      src={pm.src}
-                      alt={pm.name}
-                      title={pm.name}
-                      className={`${pm.h ?? (pm.name === "PayPal" ? "h-4" : "h-6")} w-auto ${pm.invert ? "invert" : ""}`}
-                      style={{ filter: pm.invert ? "invert(1) brightness(1.5)" : undefined }}
-                      loading="lazy"
-                    />
-                  );
-                })}
+                {paymentMethods.map((pm) => (
+                  <span
+                    key={pm.name}
+                    title={pm.name}
+                    aria-label={pm.name}
+                    className={`inline-flex items-center ${pm.h ?? "h-6"}`}
+                  >
+                    {pm.svg}
+                  </span>
+                ))}
               </div>
             </div>
 
