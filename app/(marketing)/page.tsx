@@ -2,9 +2,11 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   ArrowRight,
+  Calendar,
   CheckCircle2,
   Search,
   Star,
+  User,
   Users,
   BookOpen,
   Clock,
@@ -20,7 +22,7 @@ import { Button, LinkButton } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Section, SectionHeading } from "@/components/ui/section";
 import { TestimonialCarousel } from "@/components/testimonial-carousel";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, formatDate } from "@/lib/utils";
 import { TrendingTopics } from "@/components/trending-topics";
 
 import {
@@ -43,13 +45,18 @@ const statLabels: Record<string, string> = {
 };
 
 export default async function HomePage() {
-  const [disciplines, services, testimonials, stats, posts] = await Promise.all([
+  const results = await Promise.allSettled([
     getActiveDisciplines(),
     getActiveServices(),
     getActiveTestimonials(),
     getSiteStats(),
     getPublishedPosts(),
   ]);
+  const disciplines = results[0].status === "fulfilled" ? results[0].value : [];
+  const services = results[1].status === "fulfilled" ? results[1].value : [];
+  const testimonials = results[2].status === "fulfilled" ? results[2].value : [];
+  const stats = results[3].status === "fulfilled" ? results[3].value : [];
+  const posts = results[4].status === "fulfilled" ? results[4].value : [];
   const latestPosts = posts.slice(0, 3);
 
   const steps = [
