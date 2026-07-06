@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { NewsletterForm } from "@/components/newsletter-form";
 import { siteConfig } from "@/lib/site";
-import { Mail, MapPin, Phone, CheckCircle } from "lucide-react";
+import { Mail, MapPin, CheckCircle } from "lucide-react";
 
 const socialIcons = {
   twitter: (
@@ -77,12 +77,6 @@ export function Footer() {
                 <Mail className="h-4 w-4 shrink-0" />
                 <span>{siteConfig.email}</span>
               </a>
-              {siteConfig.phone && (
-                <span className="flex items-center gap-2.5 text-slate-400">
-                  <Phone className="h-4 w-4 shrink-0" />
-                  <span>{siteConfig.phone}</span>
-                </span>
-              )}
               {siteConfig.address && (
                 <span className="flex items-start gap-2.5 text-slate-400">
                   <MapPin className="h-4 w-4 shrink-0 mt-0.5" />
