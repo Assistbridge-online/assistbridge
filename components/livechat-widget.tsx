@@ -452,7 +452,7 @@ function LivechatWidgetInner() {
           }}
           aria-label="Open chat"
           className={cn(
-            "fixed bottom-5 right-5 z-50 h-14 w-14 rounded-full text-white shadow-xl transition",
+            "fixed bottom-36 right-5 md:bottom-24 z-50 h-14 w-14 rounded-full text-white shadow-xl transition",
             "flex items-center justify-center",
             // Soft white→indigo→teal gradient that picks up the brand
             // palette without screaming at visitors.
