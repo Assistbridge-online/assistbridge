@@ -64,8 +64,8 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: "/assistbridge-logo.png",
-    apple: "/assistbridge-logo.png",
+    icon: "/TM.png",
+    apple: "/TM.png",
   },
 };
 
@@ -75,7 +75,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     "@type": "Organization",
     name: siteConfig.name,
     url: siteConfig.url,
-    logo: `${siteConfig.url}/assistbridge-logo.png`,
+    logo: `${siteConfig.url}/TM.png`,
     description: siteConfig.description,
     email: siteConfig.email,
     sameAs: [siteConfig.social.twitter, siteConfig.social.linkedin].filter(Boolean),

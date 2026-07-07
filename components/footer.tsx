@@ -30,13 +30,13 @@ type PaymentLogo = {
 };
 
 const paymentMethods: PaymentLogo[] = [
-  { name: "Visa", src: "/images/payments/visa.svg", width: 80, height: 26 },
-  { name: "Mastercard", src: "/images/payments/mastercard.svg", width: 38, height: 24 },
-  { name: "PayPal", src: "/images/payments/paypal.svg", width: 80, height: 24 },
-  { name: "Paystack", src: "/images/payments/paystack.svg", width: 140, height: 28 },
-  { name: "Apple Pay", src: "/images/payments/apple-pay.svg", width: 70, height: 24 },
-  { name: "Google Pay", src: "/images/payments/google-pay.svg", width: 90, height: 24 },
-  { name: "American Express", src: "/images/payments/amex.svg", width: 50, height: 24 },
+  { name: "Visa", src: "/images/payments/visa.png", width: 160, height: 52 },
+  { name: "Mastercard", src: "/images/payments/mastercard.png", width: 160, height: 101 },
+  { name: "PayPal", src: "/images/payments/paypal.png", width: 160, height: 48 },
+  { name: "Paystack", src: "/images/payments/paystack.png", width: 160, height: 32 },
+  { name: "Apple Pay", src: "/images/payments/apple-pay.png", width: 160, height: 55 },
+  { name: "Google Pay", src: "/images/payments/google-pay.png", width: 160, height: 43 },
+  { name: "American Express", src: "/images/payments/amex.png", width: 160, height: 77 },
 ];
 
 export function Footer() {

@@ -1,5 +1,0 @@
-<svg viewBox="0 0 140 28" xmlns="http://www.w3.org/2000/svg">
-  <rect x="0" y="2" width="24" height="24" rx="4" fill="#011B33"/>
-  <path d="M5 8 L5 20 L9 20 L9 12.5 L13 20 L17 20 L17 8 L13 8 L13 15.5 L9 8 Z" fill="#FFFFFF"/>
-  <text x="32" y="20" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="20" font-weight="700" fill="#FFFFFF" letter-spacing="-0.5">paystack</text>
-</svg>

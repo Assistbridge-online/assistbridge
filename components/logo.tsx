@@ -35,18 +35,14 @@ export function Logo({ className, variant = "default", width = 200 }: LogoProps)
     );
   }
 
-  const h = Math.round((width * 140) / 540);
-
   return (
-    <div className={cn("relative", className)} style={{ width, height: h }}>
-      <Image
-        src="/assistbridge-logo.png"
-        alt="AssistBridge"
-        fill
-        sizes={`${width}px`}
-        className="object-contain"
-        priority
-      />
-    </div>
+    <Image
+      src="/TM.png"
+      alt="AssistBridge"
+      width={width}
+      height={width}
+      className={cn("block", className)}
+      priority
+    />
   );
 }

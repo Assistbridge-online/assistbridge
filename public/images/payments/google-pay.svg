@@ -1,9 +1,0 @@
-<svg viewBox="0 0 90 24" xmlns="http://www.w3.org/2000/svg">
-  <text x="22" y="17" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="14" font-weight="500" fill="#FFFFFF">Pay</text>
-  <path d="M3 9.5 L8.5 9.5 L8.5 14 L3 14 Z" fill="#4285F4"/>
-  <path d="M3 14 L8.5 14 L8.5 18.5 L3 18.5 Z" fill="#34A853"/>
-  <path d="M3 5 L8.5 5 L8.5 9.5 L3 9.5 Z" fill="#EA4335"/>
-  <path d="M8.5 9.5 L14 9.5 L14 14 L8.5 14 Z" fill="#FBBC04"/>
-  <path d="M8.5 5 L14 5 L14 9.5 L8.5 9.5 Z M8.5 14 L14 14 L14 18.5 L8.5 18.5 Z" fill="none"/>
-  <text x="0" y="22" font-family="'Product Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="700" fill="#FFFFFF" letter-spacing="0.5">G</text>
-</svg>
